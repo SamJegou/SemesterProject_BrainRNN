@@ -1,0 +1,15 @@
+videoRL/*
+train/*
+models/*
+data/__MACOSX/*
+data/manc-traced-adjacencies-v1.0/*
+data/manc-v1.0-neuron-properties.feather
+data/Standard Leg groups.csv
+data/Serial Leg MN groups.csv
+save/*
+error_rep.py
+ref_mvt.py
+study_benchmark.py
+study_model.py
+benchmark_MLP.py
+RL.py

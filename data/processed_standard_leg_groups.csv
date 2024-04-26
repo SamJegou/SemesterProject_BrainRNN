@@ -1,0 +1,748 @@
+id,type,group_name,target
+10062,IN21A002,,['LegNpT2_R']
+10071,IN19A029,,['LegNpT1_R']
+10125,IN19A008,2_GABA_sets_2(12),['LegNpT2_R']
+10134,IN19A008,2_GABA_sets_2(12),['LegNpT3_R']
+10144,IN19A003,4_GABA_sets(30),['LegNpT2_R']
+10154,IN19A003,4_GABA_sets(30),['LegNpT1_R']
+10156,IN19A003,4_GABA_sets(30),['LegNpT2_L']
+10168,IN13A001,,['LegNpT2_R']
+10184,IN19A011,19A_GABA_sets(12),['LegNpT3_R']
+10187,IN21A004,,['LegNpT2_R']
+10192,IN19A003,4_GABA_sets(30),['LegNpT1_L']
+10199,IN19A008,2_GABA_sets_2(12),['LegNpT1_L']
+10215,IN19A007,19A_GABA_sets(12),['LegNpT3_L']
+10220,IN19B003,4_ACH_sets_2(24),['LegNpT1_L']
+10230,IN13A009,2_unk_sets(12),['LegNpT1_R']
+10231,IN19B003,4_ACH_sets_2(24),['LegNpT3_R']
+10233,IN19A004,,['LegNpT2_R']
+10236,IN19A016,4_GABA_sets(30),['LegNpT2_L']
+10242,IN19A007,19A_GABA_sets(12),['LegNpT1_L']
+10252,IN19A007,19A_GABA_sets(12),['LegNpT2_R']
+10254,IN19A011,19A_GABA_sets(12),['LegNpT2_R']
+10259,IN19A004,,['LegNpT1_R']
+10263,IN13A001,,['LegNpT3_L']
+10274,INXXX464,4_ACH_sets_2(24),['LegNpT1_R']
+10289,IN13A001,,"['LegNpT3_R', 'MetaLNR']"
+10302,IN19B003,4_ACH_sets_2(24),['LegNpT2_R']
+10305,IN21A001,,"['IntTct', 'LegNpT2_R', 'WTctUTct-T2_R']"
+10308,IN19A011,19A_GABA_sets(12),['LegNpT2_L']
+10310,IN19A006,,"['LegNpT2_L', 'LegNpT3_L']"
+10312,IN21A001,,"['LegNpT2_L', 'WTctUTct-T2_L']"
+10317,IN19A004,,"['IntTct', 'LegNpT1_L']"
+10341,IN03A007,,['LegNpT3_L']
+10342,IN09A002,,"['IntTct', 'LegNpT1_L', 'NTctUTct-T1_L']"
+10346,IN19A007,19A_GABA_sets(12),['LegNpT3_R']
+10347,Ti extensor MN,,"['LegNpT3_L', 'MetaLNL']"
+10352,IN19A004,,"['ANm', 'LegNpT3_R']"
+10358,IN19A004,,['LegNpT3_L']
+10372,IN19A003,4_GABA_sets(30),['LegNpT3_R']
+10377,IN21A002,,['LegNpT3_R']
+10380,IN09A002,,"['ANm', 'LegNpT3_R']"
+10403,IN09A002,,"['ANm', 'LegNpT3_L']"
+10422,IN19A006,,"['LegNpT1_R', 'LegNpT2_R', 'WTctUTct-T2_R']"
+10427,IN19A007,19A_GABA_sets(12),['LegNpT1_R']
+10445,IN09A002,,"['IntTct', 'LegNpT1_R', 'NTctUTct-T1_R']"
+10461,Ti extensor MN,,['LegNpT2_R']
+10462,Ti extensor MN,,['LegNpT3_R']
+10478,IN19B003,4_ACH_sets_2(24),['LegNpT2_L']
+10489,IN19A004,,"['IntTct', 'LTct', 'LegNpT2_L']"
+10537,IN09A003,,"['LegNpT2_R', 'OvR']"
+10552,IN19A006,,"['HTctUTct-T3_R', 'LegNpT2_R', 'LegNpT3_R', 'MesoANR']"
+10565,IN13A009,2_unk_sets(12),['LegNpT3_R']
+10584,IN13A001,,['LegNpT1_L']
+10586,IN08A005,2_GLU_sets_2(12),['LegNpT3_R']
+10630,IN09A002,,"['LegNpT2_R', 'WTctUTct-T2_R']"
+10635,IN13A021,,['LegNpT1_R']
+10652,IN08A006,2_GABA_sets(12),['LegNpT2_L']
+10653,IN08A005,2_GLU_sets_2(12),['LegNpT1_L']
+10662,IN21A001,,"['HTctUTct-T3_L', 'LegNpT3_L']"
+10671,IN08A005,2_GLU_sets_2(12),['LegNpT2_L']
+10672,IN08A005,2_GLU_sets_2(12),['LegNpT1_R']
+10677,INXXX464,4_ACH_sets_2(24),['LegNpT3_R']
+10678,IN08A005,2_GLU_sets_2(12),['LegNpT2_R']
+10679,IN09A010,4_GABA_sets(30),['LegNpT1_L']
+10685,IN19A016,4_GABA_sets(30),['LegNpT2_R']
+10692,IN21A001,,['LegNpT1_L']
+10693,IN19A006,,"['HTctUTct-T3_R', 'LTct', 'LegNpT2_R', 'LegNpT3_R']"
+10702,IN13A001,,['LegNpT2_L']
+10710,Ti flexor MN,,['LegNpT2_L']
+10711,IN13A010,2_GABA_sets_2(12),['LegNpT2_R']
+10715,IN19B012,,['LegNpT1_L']
+10722,IN08A006,2_GABA_sets(12),['LegNpT1_L']
+10728,IN21A001,,"['LegNpT1_R', 'NTctUTct-T1_R']"
+10730,IN19A006,,"['HTctUTct-T3_L', 'LegNpT2_L', 'LegNpT3_L']"
+10731,IN19A006,,"['LegNpT1_R', 'LegNpT2_R', 'NTctUTct-T1_R', 'WTctUTct-T2_R']"
+10737,Ti extensor MN,,"['LTct', 'LegNpT2_L']"
+10739,IN14A008,3_GLU_sets(18),['LegNpT1_R']
+10742,IN09A003,,['LegNpT3_L']
+10780,IN21A001,,['LegNpT3_R']
+10786,IN09A003,,"['IntTct', 'LegNpT2_L', 'OvL']"
+10790,IN19B012,,['LegNpT3_L']
+10793,IN19A016,4_GABA_sets(30),['LegNpT2_R']
+10801,IN09A003,,['LegNpT3_R']
+10803,IN08A005,2_GLU_sets_2(12),['LegNpT3_L']
+10810,IN09A002,,['LegNpT2_L']
+10820,IN13A001,,['LegNpT1_R']
+10824,IN13A006,13A_GABA_sets(32),['LegNpT2_R']
+10827,IN03A007,,['LegNpT1_L']
+10828,IN19A006,,"['IntTct', 'LTct', 'LegNpT1_L', 'LegNpT2_L', 'WTctUTct-T2_L']"
+10845,IN21A002,,['LegNpT2_L']
+10866,Tr extensor MN,,['LegNpT3_R']
+10870,IN03A007,,['LegNpT3_R']
+10875,IN21A010,,"['IntTct', 'LTct', 'LegNpT2_R', 'MesoLNR']"
+10888,IN13A010,2_GABA_sets_2(12),['LegNpT3_R']
+10890,IN08A006,2_GABA_sets(12),['LegNpT3_L']
+10918,IN21A002,,['LegNpT1_R']
+10927,INXXX464,4_ACH_sets_2(24),['LegNpT3_L']
+10940,IN13A006,13A_GABA_sets(32),['LegNpT3_R']
+10978,IN21A004,,['LegNpT3_L']
+10983,IN09A003,,"['IntTct', 'LegNpT1_L']"
+11022,Sternal anterior rotator MN,,"['LegNpT3_R', 'MetaLNR']"
+11029,IN19A022,4_GABA_sets(30),['LegNpT2_R']
+11038,IN21A010,,"['LTct', 'LegNpT2_L']"
+11043,IN20A.22A001,2_ACH_sets(18),['LegNpT3_R']
+11057,IN19B003,4_ACH_sets_2(24),['LegNpT1_R']
+11060,IN21A008,2_GLU_sets(12),['LegNpT3_R']
+11093,IN19B012,,['LegNpT2_L']
+11103,IN13A014,13A_GABA_sets(32),['LegNpT2_L']
+11109,IN19B012,,"['HTctUTct-T3_R', 'LegNpT2_R']"
+11115,Ti extensor MN,,['LegNpT2_L']
+11122,IN21A004,,['LegNpT3_R']
+11152,IN13A006,13A_GABA_sets(32),['LegNpT1_R']
+11166,IN13A015,13A_GABA_sets(32),['LegNpT3_L']
+11171,IN21A004,,['LegNpT2_L']
+11190,IN03A007,,"['LegNpT2_R', 'OvR']"
+11191,IN01A015,4_ACH_sets(24),['LegNpT2_L']
+11195,IN08A006,2_GABA_sets(12),['LegNpT1_R']
+11196,IN09A003,,"['IntTct', 'LegNpT1_R', 'ProCNR']"
+11206,IN21A008,2_GLU_sets(12),['LegNpT3_L']
+11226,Fe reductor MN,,['LegNpT1_R']
+11239,IN21A004,,"['LegNpT1_L', 'LegNpT1_R']"
+11240,IN13A009,2_unk_sets(12),['LegNpT2_R']
+11271,IN13A006,13A_GABA_sets(32),['LegNpT3_L']
+11277,IN13A014,13A_GABA_sets(32),['LegNpT3_R']
+11288,IN01A015,4_ACH_sets(24),['LegNpT2_R']
+11289,IN21A012,4_ACH_sets(24),['LegNpT1_R']
+11303,IN19A003,4_GABA_sets(30),['LegNpT3_L']
+11316,IN19A008,2_GABA_sets_2(12),['LegNpT1_R']
+11325,IN21A010,,"['ANm', 'LegNpT3_R']"
+11331,IN19A006,,"['LegNpT1_L', 'LegNpT2_L', 'WTctUTct-T2_L']"
+11340,IN08A007,2_GLU_sets_2(12),['LegNpT3_R']
+11348,IN21A009,3_GLU_sets(18),['LegNpT3_R']
+11367,IN08A007,2_GLU_sets_2(12),['LegNpT2_L']
+11381,IN17A017,2_ACH_sets(18),['LegNpT2_L']
+11400,Sternal posterior rotator MN,,['LegNpT3_R']
+11404,IN17A017,2_ACH_sets(18),['LegNpT2_R']
+11411,IN19A022,4_GABA_sets(30),['LegNpT3_R']
+11435,IN13A009,2_unk_sets(12),['LegNpT1_L']
+11438,IN21A008,2_GLU_sets(12),['LegNpT2_L']
+11450,INXXX464,4_ACH_sets_2(24),['LegNpT2_L']
+11456,IN13B006,,['LegNpT2_L']
+11484,IN21A009,3_GLU_sets(18),['LegNpT1_L']
+11489,Ti extensor MN,,['LegNpT2_R']
+11501,IN13A014,13A_GABA_sets(32),['LegNpT3_L']
+11502,IN21A015,,"['IntTct', 'LegNpT2_L']"
+11503,IN08A007,2_GLU_sets_2(12),['LegNpT3_L']
+11509,IN13A021,,['LegNpT1_L']
+11511,IN19A016,4_GABA_sets(30),['LegNpT1_L']
+11516,IN20A.22A001,2_ACH_sets(18),['LegNpT3_R']
+11529,Sternal posterior rotator MN,,"['LegNpT2_R', 'MesoLNR']"
+11530,IN20A.22A001,2_ACH_sets(18),['LegNpT2_R']
+11538,IN13A014,13A_GABA_sets(32),['LegNpT2_R']
+11550,IN21A012,4_ACH_sets(24),['LegNpT3_R']
+11562,Sternal anterior rotator MN,,"['LegNpT3_R', 'MetaLNR']"
+11575,IN13A010,2_GABA_sets_2(12),['LegNpT2_L']
+11589,IN21A010,,"['LegNpT1_L', 'NTctUTct-T1_L']"
+11602,IN17A017,2_ACH_sets(18),['LegNpT3_R']
+11606,IN21A009,3_GLU_sets(18),['LegNpT2_R']
+11610,IN13A006,13A_GABA_sets(32),['LegNpT2_L']
+11631,IN21A017,4_ACH_sets(24),['LegNpT3_L']
+11636,IN20A.22A001,2_ACH_sets(18),['LegNpT1_L']
+11640,IN13A006,13A_GABA_sets(32),['LegNpT1_L']
+11657,Ti extensor MN,,['LegNpT1_L']
+11666,IN17A041,3_GLU_sets(18),['LegNpT1_L']
+11680,IN19A007,19A_GABA_sets(12),['LegNpT2_L']
+11687,IN09A010,4_GABA_sets(30),['LegNpT2_L']
+11704,IN01A015,4_ACH_sets(24),['LegNpT3_R']
+11706,Ti extensor MN,,"['LegNpT1_R', 'ProLNR']"
+11709,IN21A008,2_GLU_sets(12),['LegNpT1_R']
+11724,IN17A017,2_ACH_sets(18),['LegNpT3_L']
+11744,IN08A007,2_GLU_sets_2(12),['LegNpT1_L']
+11747,IN19A017,4_GABA_sets(30),['LegNpT1_L']
+11749,IN21A012,4_ACH_sets(24),['LegNpT2_R']
+11751,INXXX466,4_ACH_sets_2(24),['LegNpT1_L']
+11766,IN09A010,4_GABA_sets(30),['LegNpT1_R']
+11767,INXXX466,4_ACH_sets_2(24),['LegNpT2_L']
+11780,IN13A014,13A_GABA_sets(32),['LegNpT1_L']
+11793,IN19A023,4_GABA_sets(30),['LegNpT3_R']
+11812,IN17A017,2_ACH_sets(18),['LegNpT1_L']
+11819,IN08A006,2_GABA_sets(12),['LegNpT3_R']
+11826,IN21A015,,['LegNpT3_L']
+11831,IN03A007,,['LegNpT1_R']
+11850,IN17A017,2_ACH_sets(18),['LegNpT1_R']
+11854,IN21A010,,"['LegNpT1_R', 'NTctUTct-T1_R']"
+11877,IN20A.22A001,2_ACH_sets(18),['LegNpT2_R']
+11891,IN19A008,2_GABA_sets_2(12),['LegNpT2_L']
+11927,IN21A012,4_ACH_sets(24),['LegNpT3_L']
+11935,IN19A020,4_GABA_sets(30),['LegNpT3_L']
+11936,IN19A019,4_GABA_sets(30),['LegNpT1_R']
+11955,IN01A015,4_ACH_sets(24),['LegNpT1_L']
+11958,IN13B006,,"['LegNpT1_L', 'mVACT1_L']"
+11964,IN21A015,,"['LegNpT2_R', 'OvR']"
+11965,IN21A012,4_ACH_sets(24),['LegNpT2_L']
+11973,IN20A.22A001,2_ACH_sets(18),['LegNpT1_L']
+11976,IN01A015,4_ACH_sets(24),['LegNpT1_R']
+11982,IN21A009,3_GLU_sets(18),['LegNpT1_R']
+11984,IN19B012,,"['LegNpT3_L', 'LegNpT3_R']"
+12005,IN20A.22A001,2_ACH_sets(18),['LegNpT3_L']
+12026,IN13A010,2_GABA_sets_2(12),['LegNpT1_L']
+12028,IN08A007,2_GLU_sets_2(12),['LegNpT2_R']
+12049,IN19A016,4_GABA_sets(30),['LegNpT2_L']
+12050,IN03A010,4_ACH_sets(24),['LegNpT1_R']
+12067,IN21A008,2_GLU_sets(12),['LegNpT2_R']
+12069,IN13B006,,['LegNpT3_L']
+12073,IN21A017,4_ACH_sets(24),['LegNpT2_R']
+12089,IN19A004,,['LegNpT3_R']
+12096,Pleural remotor/abductor MN,,"['LegNpT1_L', 'ProANL']"
+12099,IN08A007,2_GLU_sets_2(12),['LegNpT1_R']
+12106,IN13B006,,['LegNpT2_R']
+12107,INXXX466,4_ACH_sets_2(24),['LegNpT2_R']
+12113,Fe reductor MN,,"['LegNpT3_R', 'MetaLNR']"
+12118,IN09A010,4_GABA_sets(30),['LegNpT3_L']
+12121,IN19A022,4_GABA_sets(30),['LegNpT3_R']
+12134,Ti flexor MN,,['LegNpT1_L']
+12160,IN03A010,4_ACH_sets(24),['LegNpT2_L']
+12202,IN21A012,4_ACH_sets(24),['LegNpT1_L']
+12222,IN13B006,,['LegNpT3_R']
+12233,IN21A017,4_ACH_sets(24),['LegNpT1_R']
+12240,IN21A017,4_ACH_sets(24),['LegNpT2_L']
+12246,IN19B003,4_ACH_sets_2(24),['LegNpT3_L']
+12265,IN14A008,3_GLU_sets(18),['LegNpT2_R']
+12283,IN21A017,4_ACH_sets(24),['LegNpT1_L']
+12315,INXXX466,4_ACH_sets_2(24),['LegNpT3_L']
+12344,IN21A017,4_ACH_sets(24),['LegNpT3_R']
+12373,IN13A015,13A_GABA_sets(32),['LegNpT3_R']
+12401,IN09A010,4_GABA_sets(30),['LegNpT2_R']
+12430,IN14A008,3_GLU_sets(18),['LegNpT3_R']
+12474,Acc. ti flexor MN,,"['LegNpT3_R', 'MetaLNR']"
+12531,IN21A015,,"['LegNpT3_R', 'mVACT3_R']"
+12533,IN21A002,,['LegNpT3_L']
+12550,IN14A008,3_GLU_sets(18),['LegNpT3_L']
+12567,IN19A018,4_GABA_sets(30),['LegNpT1_R']
+12585,Ti flexor MN,,['LegNpT3_L']
+12595,IN19A015,,['LegNpT1_R']
+12605,IN03A010,4_ACH_sets(24),['LegNpT3_L']
+12633,IN17A041,3_GLU_sets(18),['LegNpT2_L']
+12650,IN21A004,,['LegNpT1_L']
+12651,IN13A015,13A_GABA_sets(32),['LegNpT2_L']
+12699,IN13B006,,"['LegNpT1_R', 'ProCNR']"
+12704,Ti extensor MN,,['LegNpT1_L']
+12725,Acc. ti flexor MN,,"['LegNpT3_R', 'MetaLNR']"
+12741,IN13A015,13A_GABA_sets(32),['LegNpT2_R']
+12758,Acc. ti flexor MN,,['LegNpT3_R']
+12759,Acc. ti flexor MN,,['LegNpT3_L']
+12761,Acc. ti flexor MN,,"['DProNR', 'LegNpT1_R', 'ProLNR']"
+12769,IN03A010,4_ACH_sets(24),['LegNpT2_R']
+12790,IN13A014,13A_GABA_sets(32),['LegNpT1_R']
+12808,IN20A.22A001,2_ACH_sets(18),['LegNpT3_L']
+12849,IN19A015,,['LegNpT3_R']
+12860,IN19A022,4_GABA_sets(30),['LegNpT3_L']
+12891,Fe reductor MN,,"['LegNpT1_R', 'ProLNR']"
+13006,Ti extensor MN,,"['ANm', 'HTctUTct-T3_R', 'LegNpT3_R', 'MetaLNR']"
+13069,Sternotrochanter MN,,"['LegNpT3_R', 'MetaLNR']"
+13075,Ti extensor MN,,"['HTctUTct-T3_L', 'LegNpT3_L']"
+13090,IN09A010,4_GABA_sets(30),['LegNpT3_R']
+13109,IN06A002,,"['HTctUTct-T3_L', 'HTctUTct-T3_R', 'IntTct', 'WTctUTct-T2_L']"
+13115,Ti extensor MN,,"['DProNR', 'LegNpT1_R', 'ProLNR']"
+13125,IN19A015,,['LegNpT2_R']
+13163,Ti flexor MN,,"['LegNpT1_R', 'ProLNR']"
+13167,IN13B018,2_unk_sets(12),['LegNpT3_R']
+13170,Acc. ti flexor MN,,"['LegNpT3_R', 'MetaLNR']"
+13192,Ti flexor MN,,['LegNpT3_L']
+13280,Ti flexor MN,,['LegNpT2_R']
+13283,Ti flexor MN,,['LegNpT1_R']
+13286,IN14A008,3_GLU_sets(18),['LegNpT2_L']
+13300,Sternal anterior rotator MN,,"['LegNpT1_R', 'VProNR']"
+13310,IN13A015,13A_GABA_sets(32),['LegNpT1_L']
+13311,Ti flexor MN,,['LegNpT3_L']
+13335,IN13A020,13A_GABA_sets(32),['LegNpT2_L']
+13364,IN14A008,3_GLU_sets(18),['LegNpT1_L']
+13397,Acc. ti flexor MN,,['LegNpT1_L']
+13399,Ti flexor MN,,['LegNpT1_R']
+13427,IN16B020,,"['ANm', 'LegNpT3_R']"
+13430,IN17A041,3_GLU_sets(18),['LegNpT2_R']
+13434,Tergotr. MN,,['LegNpT3_R']
+13504,IN13B018,2_unk_sets(12),['LegNpT2_R']
+13515,IN19A004,,['LegNpT3_L']
+13563,Ti flexor MN,,"['DProNR', 'LegNpT1_R', 'PrNR', 'ProLNR']"
+13578,IN13A009,2_unk_sets(12),['LegNpT2_L']
+13621,IN03A007,,['LegNpT3_R']
+13628,Pleural remotor/abductor MN,,"['LegNpT1_L', 'NTctUTct-T1_L', 'ProANL']"
+13635,IN03B042,2_GABA_sets(12),['LegNpT1_L']
+13659,IN13A020,13A_GABA_sets(32),['LegNpT2_L']
+13698,INXXX466,4_ACH_sets_2(24),['LegNpT1_R']
+13746,Acc. ti flexor MN,,"['LegNpT2_R', 'MesoLNR']"
+13768,IN21A015,,['LegNpT1_L']
+13784,Acc. ti flexor MN,,['LegNpT2_L']
+13789,IN13A020,13A_GABA_sets(32),['LegNpT2_R']
+13819,Acc. ti flexor MN,,"['LegNpT1_R', 'ProLNR']"
+13833,IN01A038,,['LegNpT3_R']
+13850,IN13A020,13A_GABA_sets(32),['LegNpT1_L']
+13904,Tr extensor MN,,"['LegNpT2_L', 'MesoLNL']"
+13908,IN03A010,4_ACH_sets(24),['LegNpT3_R']
+13920,Fe reductor MN,,['LegNpT1_L']
+13931,IN03B042,2_GABA_sets(12),['LegNpT1_R']
+13942,Sternal posterior rotator MN,,"['LegNpT1_R', 'ProANR']"
+13944,IN17A061,4_ACH_sets_2(24),['LegNpT1_L']
+14020,Fe reductor MN,,"['LegNpT3_L', 'MetaLNL']"
+14076,IN03B042,2_GABA_sets(12),['LegNpT2_R']
+14154,IN01A038,,"['LegNpT2_L', 'LegNpT2_R']"
+14168,Pleural remotor/abductor MN,,"['LegNpT3_L', 'MetaLNL']"
+14175,IN19A015,,['LegNpT1_L']
+14176,IN01A038,,"['IntTct', 'LegNpT2_L', 'LegNpT2_R', 'OvR']"
+14226,Acc. ti flexor MN,,['LegNpT3_L']
+14231,IN19A029,,['LegNpT1_L']
+14232,IN13A020,13A_GABA_sets(32),['LegNpT3_R']
+14245,IN16B041,2_GLU_sets(12),['LegNpT1_R']
+14310,IN16B041,2_GLU_sets(12),['LegNpT3_R']
+14333,IN13A020,13A_GABA_sets(32),['LegNpT3_L']
+14346,Pleural remotor/abductor MN,,"['LegNpT1_R', 'ProANR']"
+14449,Sternal posterior rotator MN,,['LegNpT3_L']
+14468,Ti flexor MN,,['LegNpT3_L']
+14536,Tr extensor MN,,"['LegNpT1_R', 'ProLNR']"
+14555,IN17A041,3_GLU_sets(18),['LegNpT3_R']
+14596,Pleural remotor/abductor MN,,"['LegNpT3_R', 'MetaLNR']"
+14665,Acc. ti flexor MN,,['LegNpT2_L']
+14714,IN03A007,,['LegNpT2_L']
+14767,IN01A015,4_ACH_sets(24),['LegNpT3_L']
+14775,Acc. ti flexor MN,,['LegNpT2_L']
+14783,Acc. tr flexor MN,,"['LegNpT1_R', 'ProLNR']"
+14795,IN17A061,4_ACH_sets_2(24),['LegNpT2_R']
+14798,Ti flexor MN,,['LegNpT1_L']
+14824,Acc. ti flexor MN,,"['LegNpT1_R', 'ProLNR']"
+14825,IN16B041,2_GLU_sets(12),['LegNpT2_R']
+14848,Ti flexor MN,,"['LegNpT1_R', 'ProLNR']"
+14849,Acc. ti flexor MN,,['LegNpT2_R']
+14874,IN21A009,3_GLU_sets(18),['LegNpT2_L']
+14885,IN03A007,,['LegNpT3_L']
+14949,Fe reductor MN,,['LegNpT1_L']
+14975,IN21A015,,['LegNpT1_R']
+15006,Tr flexor MN,,"['LegNpT2_R', 'MesoLNR']"
+15023,Acc. ti flexor MN,,['LegNpT1_L']
+15038,Acc. ti flexor MN,,['LegNpT3_L']
+15041,IN03A007,,"['IntTct', 'LTct', 'LegNpT1_R']"
+15105,IN03B042,2_GABA_sets(12),['LegNpT2_L']
+15107,Tergotr. MN,,"['ADMNL', 'LegNpT2_L', 'MesoLNL']"
+15149,Ti flexor MN,,['LegNpT1_L']
+15262,Pleural remotor/abductor MN,,['LegNpT3_R']
+15278,Sternal posterior rotator MN,,"['LegNpT3_L', 'MetaLNL']"
+15299,IN03A007,,['LegNpT1_L']
+15321,Ti flexor MN,,['LegNpT1_L']
+15339,IN19A015,,['LegNpT2_L']
+15367,Acc. ti flexor MN,,['LegNpT1_R']
+15368,IN13B018,2_unk_sets(12),['LegNpT2_L']
+15372,IN17A061,4_ACH_sets_2(24),['LegNpT1_R']
+15386,IN17A061,,"['HTctUTct-T3_L', 'OvL', 'WTctUTct-T2_L']"
+15467,IN01A038,,"['LegNpT3_L', 'LegNpT3_R']"
+15504,IN03A007,,['LegNpT3_R']
+15525,IN04B031,14B_ACH_sets(12),['LegNpT3_R']
+15527,IN21A002,,['LegNpT1_L']
+15542,IN01A038,,"['LegNpT1_L', 'LegNpT1_R']"
+15623,Ti flexor MN,,['LegNpT2_L']
+15715,IN13A015,13A_GABA_sets(32),['LegNpT1_R']
+15728,IN13B018,2_unk_sets(12),['LegNpT1_R']
+15756,IN16B018,,['LegNpT1_R']
+15758,IN01A038,,"['LegNpT3_L', 'LegNpT3_R']"
+15775,IN13A042,13A_GABA_sets(32),['LegNpT3_R']
+15791,Acc. ti flexor MN,,['LegNpT1_L']
+15793,IN04B031,14B_ACH_sets(12),['LegNpT3_R']
+15869,IN03B042,2_GABA_sets(12),['LegNpT3_R']
+15877,IN03A007,,['LegNpT2_R']
+15881,IN01A038,,"['LegNpT1_L', 'LegNpT1_R']"
+15883,Sternal posterior rotator MN,,"['LegNpT2_L', 'MesoLNL']"
+15885,IN16B018,,['LegNpT1_L']
+15888,IN03A007,,['LegNpT3_R']
+15924,IN03A007,,['LegNpT2_L']
+16019,IN03A007,,['LegNpT3_L']
+16035,Sternal posterior rotator MN,,['LegNpT2_R']
+16045,IN17A041,3_GLU_sets(18),['LegNpT1_R']
+16092,IN04B031,14B_ACH_sets(12),['LegNpT2_L']
+16228,Acc. ti flexor MN,,"['LegNpT3_R', 'MetaLNR']"
+16295,Sternal anterior rotator MN,,"['LegNpT2_L', 'MesoLNL']"
+16385,IN03A007,,['LegNpT3_L']
+16400,Acc. tr flexor MN,,"['LegNpT1_R', 'ProLNR']"
+16419,Pleural remotor/abductor MN,,['LegNpT1_R']
+16495,Acc. ti flexor MN,,"['LegNpT2_R', 'MesoLNR']"
+16542,IN03A007,,['LegNpT2_L']
+16552,Fe reductor MN,,"['LegNpT2_R', 'MesoLNR']"
+16607,IN19A029,,['LegNpT1_R']
+16632,Acc. ti flexor MN,,['LegNpT1_L']
+16633,Fe reductor MN,,['LegNpT3_R']
+16635,Ti flexor MN,,['LegNpT2_L']
+16744,IN13A020,13A_GABA_sets(32),['LegNpT1_R']
+16769,IN03A007,,['LegNpT2_L']
+16788,IN03A007,,['LegNpT3_R']
+16800,IN04B037,14B_ACH_sets(12),['LegNpT2_L']
+16894,IN16B041,2_GLU_sets(12),['LegNpT1_L']
+16903,Acc. tr flexor MN,,"['LegNpT3_R', 'MetaLNR']"
+16917,IN04B031,14B_ACH_sets(12),['LegNpT3_L']
+16931,IN03A007,,['LegNpT2_R']
+16963,Tr flexor MN,,"['LegNpT1_L', 'ProANL']"
+16978,IN03A007,,['LegNpT2_L']
+16997,IN03A007,,"['LegNpT1_L', 'LegNpT1_R']"
+17018,Acc. ti flexor MN,,['LegNpT3_L']
+17070,Acc. ti flexor MN,,['LegNpT2_L']
+17091,Pleural remotor/abductor MN,,"['LegNpT2_L', 'MesoLNL']"
+17132,IN17A041,3_GLU_sets(18),['LegNpT3_L']
+17133,Ti flexor MN,,['LegNpT1_L']
+17135,IN03A007,,['LegNpT3_L']
+17137,Tr flexor MN,,['LegNpT3_R']
+17140,IN03A007,,['LegNpT2_L']
+17161,IN01A038,,"['IntTct', 'LegNpT1_L', 'LegNpT1_R']"
+17176,Sternal anterior rotator MN,,"['DProNL', 'LegNpT1_L', 'VProNL']"
+17213,IN19A029,,['LegNpT1_L']
+17222,IN19A029,,['LegNpT1_R']
+17226,Tr flexor MN,,['LegNpT1_L']
+17251,IN17A061,4_ACH_sets_2(24),['LegNpT2_L']
+17264,IN03A007,,['LegNpT1_R']
+17332,IN03A007,,"['LegNpT1_L', 'LegNpT1_R']"
+17343,IN03A007,,['LegNpT3_R']
+17345,IN03A007,,['LegNpT1_L']
+17397,IN16B041,2_GLU_sets(12),['LegNpT2_L']
+17403,IN16B018,,"['LegNpT2_L', 'OvL']"
+17435,IN04B031,14B_ACH_sets(12),['LegNpT2_R']
+17443,IN03A007,,['LegNpT2_R']
+17473,IN01A038,,"['LegNpT3_L', 'LegNpT3_R']"
+17525,IN03A007,,"['LegNpT2_R', 'OvR']"
+17574,IN03A007,,['LegNpT3_R']
+17598,IN03A007,,['LegNpT3_L']
+17665,IN03A007,,['LegNpT1_L']
+17693,Acc. tr flexor MN,,"['LegNpT3_R', 'MetaLNR']"
+17709,IN13A042,13A_GABA_sets(32),['LegNpT1_L']
+17726,IN19A015,,['LegNpT3_L']
+17739,IN03A007,,['LegNpT3_R']
+17741,IN03A007,,"['IntTct', 'LegNpT1_L']"
+17754,IN03A007,,['LegNpT2_L']
+17802,IN04B037,14B_ACH_sets(12),['LegNpT3_L']
+17813,IN13A021,,['LegNpT1_R']
+17867,IN03A007,,"['LegNpT1_L', 'LegNpT1_R']"
+17876,IN03A007,,['LegNpT3_R']
+17885,Acc. ti flexor MN,,['LegNpT1_L']
+17917,IN03A007,,['LegNpT1_L']
+17930,Tr extensor MN,,"['LegNpT2_R', 'MesoANR', 'MesoLNR']"
+17947,Sternal posterior rotator MN,,"['LegNpT3_R', 'MetaLNR']"
+17953,IN03A007,,"['LegNpT1_L', 'LegNpT1_R']"
+17958,IN03A007,,['LegNpT3_R']
+17962,IN03A007,,['LegNpT2_L']
+18006,Sternotrochanter MN,,"['CV', 'LegNpT1_R']"
+18007,IN03A007,,['LegNpT3_L']
+18089,IN13A021,,['LegNpT1_R']
+18132,IN01A038,,"['CV', 'LegNpT1_L', 'LegNpT1_R']"
+18137,IN13A010,2_GABA_sets_2(12),['LegNpT1_R']
+18144,IN03A007,,"['LegNpT2_L', 'LegNpT2_R', 'OvR']"
+18168,IN13A021,,['LegNpT1_L']
+18194,IN03A007,,"['LegNpT3_L', 'LegNpT3_R']"
+18236,IN03A007,,"['LegNpT3_L', 'LegNpT3_R']"
+18246,IN13A021,,['LegNpT1_L']
+18286,Pleural remotor/abductor MN,,['LegNpT3_L']
+18322,IN03A007,,['LegNpT3_L']
+18394,IN03A007,,['LegNpT1_L']
+18412,Acc. ti flexor MN,,"['LegNpT1_L', 'ProLNL']"
+18413,IN03A007,,"['LegNpT1_L', 'LegNpT1_R']"
+18440,Tr flexor MN,,['LegNpT1_R']
+18443,IN03A007,,['LegNpT3_R']
+18448,Ti flexor MN,,['LegNpT2_R']
+18471,Sternal anterior rotator MN,,"['LegNpT3_L', 'MetaLNL']"
+18479,IN03A007,,['LegNpT2_R']
+18488,IN03A007,,['LegNpT3_L']
+18491,Ti flexor MN,,['LegNpT3_R']
+18501,IN20A.22A001,2_ACH_sets(18),['LegNpT2_L']
+18504,IN03A007,,"['LegNpT3_L', 'LegNpT3_R']"
+18520,IN03A007,,"['LegNpT1_L', 'LegNpT1_R']"
+18529,IN16B018,,['LegNpT1_L']
+18554,Acc. ti flexor MN,,['LegNpT1_L']
+18562,IN03A007,,['LegNpT2_L']
+18579,Sternotrochanter MN,,"['DProNL', 'LegNpT1_L', 'VProNL']"
+18595,IN03A007,,['LegNpT3_L']
+18605,IN04B031,14B_ACH_sets(12),['LegNpT1_L']
+18625,IN03A007,,['LegNpT3_L']
+18664,Acc. ti flexor MN,,"['LegNpT2_R', 'MesoLNR']"
+18697,IN03A007,,['LegNpT1_L']
+18712,IN04B037,14B_ACH_sets(12),['LegNpT1_R']
+18716,Sternotrochanter MN,,"['LegNpT2_R', 'MesoLNR']"
+18773,IN13A021,,['LegNpT1_L']
+18776,IN03A007,,['LegNpT2_L']
+18827,IN13A021,,['LegNpT1_R']
+18831,IN04B037,14B_ACH_sets(12),['LegNpT1_L']
+18834,IN03A007,,['LegNpT1_R']
+18836,IN03A007,,"['LegNpT2_L', 'LegNpT2_R']"
+18841,IN03A007,,"['LegNpT1_L', 'LegNpT1_R']"
+18907,IN03A007,,['LegNpT3_R']
+18963,Acc. ti flexor MN,,['LegNpT1_R']
+18971,IN03A007,,['LegNpT3_R']
+18983,Fe reductor MN,,"['LegNpT1_R', 'ProLNR']"
+18992,IN16B018,,"['LegNpT2_L', 'OvL']"
+19048,Acc. ti flexor MN,,['LegNpT1_R']
+19074,Acc. ti flexor MN,,['LegNpT3_L']
+19084,IN03A007,,['LegNpT2_L']
+19094,Sternotrochanter MN,,"['LegNpT2_R', 'MesoLNR']"
+19105,IN17A061,,"['HTctUTct-T3_L', 'OvL', 'WTctUTct-T2_L']"
+19111,IN19A011,19A_GABA_sets(12),['LegNpT3_L']
+19115,IN03A007,,['LegNpT2_R']
+19192,IN17A061,,"['HTctUTct-T3_R', 'OvR', 'WTctUTct-T2_R']"
+19206,Pleural remotor/abductor MN,,['LegNpT2_R']
+19236,IN17A061,4_ACH_sets_2(24),['LegNpT3_R']
+19260,Acc. ti flexor MN,,['LegNpT3_R']
+19413,IN03A007,,['LegNpT1_R']
+19443,Tergotr. MN,,['LegNpT1_R']
+19497,IN04B037,14B_ACH_sets(12),['LegNpT2_R']
+19515,IN03A007,,['LegNpT3_L']
+19563,IN16B020,,['LegNpT1_R']
+19613,Acc. tr flexor MN,,['LegNpT3_R']
+19646,IN03A007,,['LegNpT2_L']
+19652,Tergotr. MN,,"['CV', 'DProNL', 'LegNpT1_L', 'VProNL']"
+19667,Sternal posterior rotator MN,,"['LegNpT1_L', 'ProANL']"
+19690,IN03A007,,['LegNpT1_R']
+19699,IN03A007,,['LegNpT1_R']
+19704,Tr flexor MN,,"['LegNpT2_L', 'MesoLNL']"
+19771,Tr flexor MN,,"['LegNpT1_L', 'ProANL']"
+19803,IN13A042,13A_GABA_sets(32),['LegNpT3_L']
+19825,IN13A042,13A_GABA_sets(32),['LegNpT1_R']
+19839,IN16B018,,['LegNpT2_L']
+19842,IN17A061,4_ACH_sets_2(24),['LegNpT3_L']
+19867,IN16B020,,['LegNpT1_R']
+19870,IN03A007,,['LegNpT2_R']
+19886,Tr flexor MN,,"['LegNpT1_R', 'ProANR', 'ProLNR']"
+19929,Tr extensor MN,,['LegNpT1_L']
+19983,Tr flexor MN,,"['LegNpT2_R', 'MesoLNR']"
+20054,IN03A007,,['LegNpT2_R']
+20119,Sternal anterior rotator MN,,"['LegNpT2_L', 'MesoLNL']"
+20128,IN16B020,,"['LegNpT1_R', 'LegNpT2_R']"
+20158,IN03A007,,['LegNpT1_R']
+20173,IN16B018,,"['LegNpT1_R', 'LegNpT2_R']"
+20317,IN16B018,,['LegNpT1_R']
+20333,IN03A007,,['LegNpT2_L']
+20366,IN13A042,13A_GABA_sets(32),['LegNpT2_L']
+20373,Acc. ti flexor MN,,['LegNpT1_R']
+20462,IN06A002,,"['HTctUTct-T3_L', 'HTctUTct-T3_R', 'IntTct', 'LegNpT2_R', 'WTctUTct-T2_L', 'WTctUTct-T2_R']"
+20471,IN19A029,,['LegNpT3_R']
+20488,IN16B018,,"['LegNpT2_R', 'OvR']"
+20494,IN16B018,,['LegNpT1_R']
+20572,Tr flexor MN,,"['DProNR', 'LegNpT1_R', 'VProNR']"
+20579,IN16B018,,"['LegNpT2_L', 'OvL']"
+20593,Acc. ti flexor MN,,['LegNpT3_R']
+20605,Acc. ti flexor MN,,"['LegNpT1_R', 'ProLNR']"
+20615,Sternotrochanter MN,,['LegNpT1_R']
+20673,Tr flexor MN,,['LegNpT1_R']
+20743,IN03A007,,['LegNpT2_R']
+20882,IN03A007,,['LegNpT1_R']
+20948,IN03A007,,['LegNpT3_L']
+20989,IN16B020,,['LegNpT2_L']
+21006,IN03A007,,"['LegNpT1_L', 'LegNpT1_R']"
+21034,IN16B018,,['LegNpT2_L']
+21043,IN03A007,,['LegNpT3_L']
+21095,IN16B020,,['LegNpT1_L']
+21186,Tr flexor MN,,['LegNpT3_L']
+21233,IN13A042,13A_GABA_sets(32),['LegNpT2_R']
+21241,Sternal posterior rotator MN,,"['LegNpT1_R', 'ProANR', 'ProLNR']"
+21255,Pleural remotor/abductor MN,,['LegNpT2_L']
+21262,Acc. ti flexor MN,,['LegNpT2_L']
+21282,IN03A007,,['LegNpT1_R']
+21342,IN03A007,,['LegNpT1_L']
+21354,IN03A007,,['LegNpT3_L']
+21551,IN16B020,,['LegNpT3_L']
+21612,Tr flexor MN,,['LegNpT1_R']
+21665,Fe reductor MN,,['LegNpT3_L']
+21711,IN16B020,,['LegNpT2_R']
+21753,Tergotr. MN,,"['DProNL', 'LegNpT1_L', 'VProNL']"
+21874,IN13A021,,['LegNpT1_R']
+21914,IN03A007,,['LegNpT3_L']
+21944,Fe reductor MN,,['LegNpT1_L']
+21985,IN03A007,,['LegNpT2_R']
+21991,Ti flexor MN,,"['LegNpT3_R', 'MetaLNR']"
+22126,Tergotr. MN,,"['CV', 'LegNpT1_R']"
+22215,Sternal anterior rotator MN,,"['CV', 'LegNpT1_R', 'VProNR']"
+22250,IN19A029,,['LegNpT1_L']
+22429,IN16B020,,"['LTct', 'LegNpT2_L']"
+22449,IN16B020,,"['ANm', 'LegNpT3_L']"
+22465,Tr flexor MN,,"['LegNpT3_R', 'MetaLNR']"
+22487,Acc. tr flexor MN,,['LegNpT3_L']
+22538,IN21A009,3_GLU_sets(18),['LegNpT3_L']
+22718,Tr flexor MN,,['LegNpT2_L']
+22729,Acc. tr flexor MN,,['LegNpT1_R']
+22788,IN16B018,,"['LegNpT2_L', 'OvL']"
+22813,IN01A038,,"['LegNpT2_L', 'LegNpT2_R', 'OvR']"
+23048,Acc. tr flexor MN,,"['LegNpT1_L', 'ProLNL']"
+23117,Tr flexor MN,,"['LegNpT3_L', 'MetaLNL']"
+23251,IN16B018,,"['IntTct', 'LegNpT2_L']"
+23299,Tr flexor MN,,"['LegNpT1_L', 'VProNL']"
+23318,Tergotr. MN,,['LegNpT1_R']
+23364,Tr flexor MN,,"['LegNpT2_L', 'MesoLNL']"
+23450,IN16B018,,"['LegNpT2_R', 'OvR']"
+23473,IN19A029,,['LegNpT2_L']
+23537,IN03A007,,['LegNpT1_L']
+23553,Tergotr. MN,,['LegNpT1_R']
+23648,IN03B042,2_GABA_sets(12),['LegNpT3_L']
+23698,Acc. ti flexor MN,,['LegNpT1_L']
+23832,IN16B018,,"['LegNpT2_L', 'OvL']"
+23974,Acc. tr flexor MN,,['LegNpT3_L']
+24050,Fe reductor MN,,"['LegNpT1_R', 'ProLNR', 'VProNR']"
+24197,IN16B020,,['LegNpT3_R']
+24327,IN13B018,2_unk_sets(12),['LegNpT1_L']
+24366,IN19A029,,['LegNpT2_R']
+24405,IN16B020,,['LegNpT1_L']
+24443,Acc. ti flexor MN,,"['LegNpT2_R', 'MesoLNR']"
+24609,IN19A029,,['LegNpT3_L']
+24668,Tr flexor MN,,['LegNpT3_L']
+24669,Sternal anterior rotator MN,,"['LegNpT2_R', 'MesoLNR']"
+24747,Sternal posterior rotator MN,,['LegNpT1_L']
+24828,Acc. ti flexor MN,,['LegNpT2_L']
+24906,IN03A007,,['LegNpT2_L']
+25210,IN13A010,2_GABA_sets_2(12),['LegNpT3_L']
+25212,Acc. ti flexor MN,,['LegNpT2_L']
+25248,IN19A029,,['LegNpT1_L']
+25298,IN16B018,,['LegNpT2_R']
+25475,Acc. tr flexor MN,,"['LegNpT1_L', 'ProLNL']"
+25767,Sternal posterior rotator MN,,"['LegNpT1_R', 'ProANR', 'ProLNR']"
+25852,IN16B018,,"['IntTct', 'LegNpT2_R', 'OvR', 'WTctUTct-T2_R']"
+25885,Acc. ti flexor MN,,['LegNpT3_L']
+25892,Sternal posterior rotator MN,,['LegNpT1_R']
+26132,Sternotrochanter MN,,"['ADMNL', 'LegNpT2_L', 'MesoLNL', 'PDMNL', 'WTctUTct-T2_L']"
+26241,IN04B031,14B_ACH_sets(12),['LegNpT1_R']
+26281,IN19A029,,['LegNpT1_R']
+26370,Acc. tr flexor MN,,['LegNpT2_R']
+26399,IN16B018,,['LegNpT2_R']
+26420,IN16B018,,['LegNpT2_L']
+26566,Sternal anterior rotator MN,,"['DProNL', 'LegNpT1_L', 'VProNL']"
+26588,Acc. tr flexor MN,,['LegNpT1_L']
+26613,Tr flexor MN,,['LegNpT1_L']
+26658,Acc. ti flexor MN,,['LegNpT1_R']
+26777,Acc. ti flexor MN,,[]
+26823,IN19A021,4_GABA_sets(30),['LegNpT3_L']
+26883,Tr flexor MN,,"['LegNpT3_R', 'MetaLNR']"
+27028,Tr extensor MN,,['LegNpT1_R']
+27258,Sternal posterior rotator MN,,"['LegNpT3_L', 'MetaLNL']"
+27711,IN16B018,,['LegNpT2_L']
+28219,Sternal posterior rotator MN,,['LegNpT3_R']
+28226,IN16B018,,"['LegNpT2_L', 'OvL']"
+28884,Fe reductor MN,,['LegNpT1_R']
+28997,Tr flexor MN,,['LegNpT3_R']
+29187,Fe reductor MN,,['LegNpT2_L']
+29432,IN04B037,14B_ACH_sets(12),['LegNpT3_R']
+29484,Fe reductor MN,,['LegNpT1_R']
+29689,Sternal posterior rotator MN,,['LegNpT1_L']
+29776,IN16B018,,"['LegNpT2_R', 'OvR']"
+30306,Tr extensor MN,,"['LegNpT2_L', 'MesoLNL']"
+34004,Acc. tr flexor MN,,['LegNpT3_L']
+34115,Tr flexor MN,,['LegNpT2_R']
+35432,Fe reductor MN,,['LegNpT2_R']
+37220,Ti flexor MN,,['LegNpT3_R']
+40218,IN19A029,,['LegNpT1_L']
+40443,Tr flexor MN,,"['LegNpT3_R', 'MetaLNR']"
+41353,Tr flexor MN,,['LegNpT1_R']
+41439,Tr flexor MN,,['LegNpT3_R']
+41482,Pleural remotor/abductor MN,,"['LegNpT2_R', 'MesoLNR']"
+41933,Tr flexor MN,,['LegNpT1_R']
+42738,Fe reductor MN,,['LegNpT2_R']
+45494,Fe reductor MN,,['LegNpT2_L']
+45807,IN19A029,,['LegNpT1_R']
+49886,Sternal posterior rotator MN,,['LegNpT2_L']
+96565,Tr flexor MN,,['LegNpT3_R']
+100352,IN13A021,,['LegNpT1_L']
+100492,IN03A010,4_ACH_sets(24),['LegNpT1_L']
+100515,Sternotrochanter MN,,"['LegNpT1_L', 'VProNL']"
+100544,INXXX464,4_ACH_sets_2(24),['LegNpT2_R']
+100707,Ti flexor MN,,['LegNpT2_L']
+100790,IN16B018,,"['LegNpT2_R', 'OvR']"
+100820,IN21A010,,['LegNpT3_L']
+100826,Tr extensor MN,,"['LegNpT3_L', 'MetaLNL']"
+100855,IN08A006,2_GABA_sets(12),['LegNpT2_R']
+100904,IN13A020,13A_GABA_sets(32),['LegNpT2_R']
+100994,IN16B041,2_GLU_sets(12),['LegNpT3_L']
+101043,Acc. ti flexor MN,,['LegNpT1_L']
+101119,IN16B018,,"['IntTct', 'LegNpT2_R', 'OvR']"
+101200,IN16B018,,"['LegNpT2_R', 'OvR']"
+101764,IN03A007,,['LegNpT2_R']
+101794,IN19A011,19A_GABA_sets(12),['LegNpT1_L']
+102019,Acc. tr flexor MN,,"['LegNpT2_R', 'MesoLNR']"
+102601,IN01A038,,"['ADMNR', 'LegNpT2_L']"
+102694,IN19A022,4_GABA_sets(30),['LegNpT1_R']
+102786,Sternal posterior rotator MN,,"['LegNpT2_R', 'MesoLNR']"
+104697,Sternal posterior rotator MN,,"['LegNpT2_R', 'MesoLNR']"
+152620,Sternotrochanter MN,,['LegNpT3_R']
+152621,Sternotrochanter MN,,"['LegNpT3_R', 'MetaLNR']"
+152642,Sternotrochanter MN,,"['LegNpT3_L', 'MetaLNL']"
+152696,INXXX466,4_ACH_sets_2(24),['LegNpT3_R']
+152743,IN16B018,,['LegNpT1_L']
+152785,IN16B018,,"['IntTct', 'LegNpT2_R', 'OvR']"
+153142,Tr flexor MN,,"['LegNpT1_L', 'VProNL']"
+153315,Tr flexor MN,,['LegNpT2_L']
+153335,Ti flexor MN,,['LegNpT2_L']
+153806,IN16B020,,['LegNpT1_L']
+154133,Sternal posterior rotator MN,,['LegNpT3_R']
+154269,IN03A007,,['LegNpT1_L']
+154383,IN20A.22A001,2_ACH_sets(18),['LegNpT2_L']
+154691,IN19B012,,['LegNpT1_R']
+154769,Sternal posterior rotator MN,,"['LegNpT2_L', 'MesoLNL']"
+154800,IN19A022,4_GABA_sets(30),['LegNpT1_L']
+155216,Acc. tr flexor MN,,['LegNpT2_L']
+155218,Tr flexor MN,,['LegNpT2_L']
+155633,Tergotr. MN,,"['CV', 'DProNL', 'LegNpT1_L', 'VProNL']"
+156180,Acc. tr flexor MN,,['LegNpT2_L']
+156233,Tr flexor MN,,['LegNpT2_L']
+156857,Fe reductor MN,,"['LegNpT1_L', 'ProLNL']"
+157077,IN19A029,,['LegNpT1_L']
+157207,Tr flexor MN,,"['LegNpT2_R', 'MesoLNR']"
+157432,Sternotrochanter MN,,['LegNpT3_L']
+157503,Sternotrochanter MN,,"['LegNpT3_L', 'MetaLNL']"
+157964,IN03A007,,['LegNpT2_L']
+158326,IN19A029,,['LegNpT1_R']
+158681,Fe reductor MN,,['LegNpT2_L']
+158694,Tr flexor MN,,"['ADMNL', 'LegNpT1_L']"
+158769,Tr flexor MN,,['LegNpT2_R']
+159502,IN20A.22A001,2_ACH_sets(18),['LegNpT1_R']
+159762,Tergotr. MN,,['LegNpT3_L']
+159822,Tr flexor MN,,['LegNpT1_R']
+162543,INXXX464,4_ACH_sets_2(24),['LegNpT1_L']
+162622,IN03A007,,['LegNpT2_L']
+162833,Tr extensor MN,,"['LegNpT2_R', 'MesoLNR']"
+162868,Acc. ti flexor MN,,['LegNpT2_R']
+162912,Tr extensor MN,,['LegNpT3_L']
+162913,Tr flexor MN,,['LegNpT3_L']
+163596,IN19A029,,['LegNpT3_L']
+163686,Tr flexor MN,,"['DProNL', 'LegNpT1_L', 'VProNL']"
+163719,Sternal posterior rotator MN,,"['LegNpT1_L', 'ProANL']"
+164107,IN03A007,,['LegNpT2_R']
+164741,Sternal anterior rotator MN,,['LegNpT3_L']
+165009,IN20A.22A001,2_ACH_sets(18),['LegNpT1_R']
+165340,Tr extensor MN,,"['ANm', 'LegNpT3_R', 'MetaLNR']"
+166171,Tr flexor MN,,['LegNpT3_L']
+166309,Tergotr. MN,,"['DProNL', 'LegNpT1_L', 'VProNL']"
+166337,Pleural remotor/abductor MN,,"['LegNpT2_R', 'MesoLNR']"
+166374,Acc. ti flexor MN,,['LegNpT1_L']
+166392,Sternotrochanter MN,,"['LegNpT2_L', 'MesoLNL']"
+166397,Acc. ti flexor MN,,['LegNpT2_R']
+167361,IN13B018,2_unk_sets(12),['LegNpT3_L']
+167438,Ti flexor MN,,['LegNpT2_R']
+167442,Tr flexor MN,,"['LegNpT2_L', 'MesoLNL']"
+170932,IN13A009,2_unk_sets(12),['LegNpT3_L']
+171403,IN19A022,4_GABA_sets(30),['LegNpT2_L']
+171438,IN03A007,,['LegNpT2_L']
+171761,IN21A008,2_GLU_sets(12),['LegNpT1_L']
+171948,Tr flexor MN,,"['LegNpT2_R', 'MesoLNR']"
+172106,IN19A029,,['LegNpT1_R']
+172107,IN19A011,19A_GABA_sets(12),['LegNpT1_R']
+172408,Sternal posterior rotator MN,,['LegNpT2_L']
+173560,Tr extensor MN,,['LegNpT1_L']
+174652,IN03A007,,['LegNpT2_R']
+174828,IN19A008,2_GABA_sets_2(12),['LegNpT3_L']
+175327,Tergotr. MN,,"['LegNpT2_R', 'MesoLNR']"
+176866,Acc. ti flexor MN,,['LegNpT3_L']
+192299,Ti flexor MN,,['LegNpT2_R']
+218885,Tr flexor MN,,['LegNpT2_R']
+219796,Sternal anterior rotator MN,,"['LegNpT2_R', 'MesoLNR']"
+219853,Pleural remotor/abductor MN,,"['LegNpT2_L', 'MesoLNL']"
+219894,Fe reductor MN,,['LegNpT1_L']
+226276,Fe reductor MN,,['LegNpT1_L']
+11162403133,Sternal posterior rotator MN,,['LegNpT3_L']
