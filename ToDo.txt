@@ -22,6 +22,7 @@ V Modify reward function to have something ~like deepmimic & help training -> OB
 
 V modifier PPO.train -> on doit voir trop de fois les mêmes step avec la méthode actuelle
 
+- Modifier reward pour que ce soit indépendant (?) de la taille de l'épisode -> pour le moment, rester debout sans avancer rapporte pas mal de reward
 - Modifier les poids task/imitation 
 
 - Ajuster les poids initiaux de BrainRNN en fonction des weights de adj_mat
@@ -33,3 +34,6 @@ V modifier PPO.train -> on doit voir trop de fois les mêmes step avec la métho
 
 - Truncated BPTT -> faster run // Already implemented in ¨PPO with sample_mb ?
 
+
+Training:
+- init random: marche mieux que 0

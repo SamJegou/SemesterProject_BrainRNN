@@ -13,9 +13,9 @@ from BrainRNN import BrainRNN
 ### Parameters ###
 
 device = torch.device("cpu")
-MAX_STEPS = 300
+MAX_STEPS = 200
 MIN_SEQUENCE_LEN = 20
-N_EPISODE = 40
+N_EPISODE = 100
 
 REF_STATES_PATH = 'data/BW_ref_states.npy'
 ref_states = np.load(REF_STATES_PATH)
@@ -35,17 +35,37 @@ a_dim = env.action_space.shape[0]
 env = RecordVideo(env, 
                    video_folder="videoRL/",
                    name_prefix="test-video",
-                   episode_trigger=lambda x: x % 5 == 0)
+                   episode_trigger=lambda x: x % 10 == 0)
 
 class ModifiedRewardWrapper(Wrapper):
-    def __init__(self, env, w_I=0.7, w_G=0.3, w_p=0.65, w_v=0.1, w_e=0.15, w_c=0.1):
+    def __init__(self, env, w_I=0.7, w_G=0.3, w_p=0.65, w_v=0.1, w_e=0.15, w_c=0.1, fall_penalization=20):
+        '''
+        Args:
+        env: gym/torchRL environment
+        w_I: float
+            imitation reward weight
+        w_G: float
+            Goal/Task reward weight
+        w_p: float
+            pose reward weight
+        w_v: float
+            velocity reward weight
+        w_e: float, NOT USED
+            end-effector reward weight
+        w_c: float, NOT USED
+            center of mass reward weight
+        fall_penalization: float
+            reward penalization if the agent falls
+        '''
         super().__init__(env)
+        imitation_sum = w_p+w_v+w_e+w_c  # normalize weights
         self.w_I = w_I
         self.w_G = w_G
-        self.w_v = w_v
-        self.w_p = w_p
-        self.w_e = w_e
-        self.w_c = w_c
+        self.w_v = w_v/imitation_sum
+        self.w_p = w_p/imitation_sum
+        self.w_e = w_e/imitation_sum
+        self.w_c = w_c/imitation_sum
+        self.fall_penalization=abs(fall_penalization)
 
         self.step_counter = 0
     
@@ -59,13 +79,13 @@ class ModifiedRewardWrapper(Wrapper):
 
         task_r = np.exp(-2.5*np.max((0, mean_speed - obs[x_vel_idx]))**2)
         if reward_base == -100: # robot fell
-            task_r -= 20
+            task_r -= self.fall_penalization
 
         pose_r = np.exp(-2*(
-            np.sum(np.cos(ref[joints_angle_idx])-np.cos(obs[joints_angle_idx]))**2
-            + np.sum(np.sin(ref[joints_angle_idx])-np.sin(obs[joints_angle_idx]))**2)
+            np.sum((np.cos(ref[joints_angle_idx])-np.cos(obs[joints_angle_idx]))**2)
+            + np.sum((np.sin(ref[joints_angle_idx])-np.sin(obs[joints_angle_idx]))**2))
         )
-        vel_r = np.exp(-0.1*np.sum(ref[joints_vel_idx]-obs[joints_vel_idx])**2)
+        vel_r = np.exp(-0.1*np.sum((ref[joints_vel_idx]-obs[joints_vel_idx])**2))
         end_effector_r = 0
         center_mass_r = 0
         imitation_r = (self.w_p*pose_r
@@ -79,7 +99,12 @@ class ModifiedRewardWrapper(Wrapper):
 
         return obs, reward, terminated, truncated, info
 
-env = ModifiedRewardWrapper(env) # un-comment once Wrapper is done
+env = ModifiedRewardWrapper(env, 
+                            w_I=0.65, 
+                            w_G=0.45, 
+                            fall_penalization=10,
+                            w_p=0.5, 
+                            w_v=0.5) # un-comment once Wrapper is done
 
 ### Policy Network & Value Network Construction ###
 
@@ -106,27 +131,28 @@ class FixedNormal(torch.distributions.Normal):
 
 #Diagonal Gaussian module
 class DiagGaussian(nn.Module):
-    def __init__(self, inp_dim, out_dim):
+    def __init__(self, inp_dim, out_dim, std=1.0):
         super(DiagGaussian, self).__init__()
         self.fc_mean = nn.Linear(inp_dim, out_dim)
         self.b_logstd = AddBias(torch.zeros(out_dim))
+        self.std = std
     
     def forward(self, x):
         mean = self.fc_mean(x)
         logstd = self.b_logstd(torch.zeros_like(mean))
-        return FixedNormal(mean, logstd.exp())
+        return FixedNormal(mean, logstd.exp()*self.std)
 
 #Policy Network
 class PolicyNet(nn.Module):
     #Constructor
-    def __init__(self, s_dim, a_dim):
+    def __init__(self, s_dim, a_dim, std):
         super(PolicyNet, self).__init__()
         self.main = BrainRNN(s_dim,
                              output_size,
                              adj_mat,
                              layers,
                              batch_size=batch_size)
-        self.dist = DiagGaussian(output_size, a_dim)
+        self.dist = DiagGaussian(output_size, a_dim, std=std)
     
     #Forward pass
     def forward(self, state, deterministic=False):
@@ -156,9 +182,10 @@ class PolicyNet(nn.Module):
         dist = self.dist(feature)
         return dist.log_probs(action), dist.entropy()
 
-    def reset_hidden_states(self, hidden_states=None, hidden_size=None):
+    def reset_hidden_states(self, hidden_states=None, hidden_size=None, method='zero'):
         self.main.reset_hidden_states(hidden_states=hidden_states,
-                                      hidden_size=hidden_size)
+                                      hidden_size=hidden_size,
+                                      method=method)
 
 #Value Network
 class ValueNet(nn.Module):
@@ -175,11 +202,12 @@ class ValueNet(nn.Module):
     def forward(self, state):
         return self.main(state)[..., 0]
 
-    def reset_hidden_states(self, hidden_states=None, hidden_size=None):
+    def reset_hidden_states(self, hidden_states=None, hidden_size=None, method='zero'):
         self.main.reset_hidden_states(hidden_states=hidden_states,
-                                      hidden_size=hidden_size)
+                                      hidden_size=hidden_size,
+                                      method=method)
 
-policy_net = PolicyNet(s_dim, a_dim)
+policy_net = PolicyNet(s_dim, a_dim, std=1.)
 value_net = ValueNet(s_dim)
 
 
@@ -314,6 +342,8 @@ class PPO:
         k = int(np.log2(episode_length/MIN_SEQUENCE_LEN))
         sample_n_mb = 2**k
         sequence_length = int(episode_length/sample_n_mb)
+        if sequence_length >= episode_length:
+            sequence_length = episode_length//2
         #sample_n_mb = (episode_length-self.max_seq_len)//self.sample_mb_size
 
         #if sample_n_mb <= 0:
@@ -330,8 +360,8 @@ class PPO:
             
             #Randomly sample a batch for training
             v_loss, pg_loss = 0, 0
-            self.policy_net.reset_hidden_states(hidden_size=sample_n_mb)
-            self.value_net.reset_hidden_states(hidden_size=sample_n_mb)
+            self.policy_net.reset_hidden_states(hidden_size=sample_n_mb, method='random')
+            self.value_net.reset_hidden_states(hidden_size=sample_n_mb, method='random')
             for t in range(sequence_length):
                 sample_states = mb_states[sample_idx]
                 sample_actions = mb_actions[sample_idx]
