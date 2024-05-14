@@ -141,6 +141,9 @@ if PROCESS: # organization in layers
     
     # last layer of motorneurons
     layers.append(MN_idx)
+
+    for layer in layers:
+        layer.sort()
     
     with open(DATA_FOLDER+SAVE_NAME_LAYERS, 'w') as file:
         json.dump(layers, file)

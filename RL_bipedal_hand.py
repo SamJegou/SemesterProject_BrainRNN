@@ -11,18 +11,37 @@ from BrainRNN import BrainRNN
 
 
 ### Parameters ###
+DUMB_MVT = False
+TRAIN = True
+CONTINUE_TRAINING = False
 
-device = torch.device("cpu")
-MAX_STEPS = 200
+device = torch.device("cpu") #torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+MAX_STEPS = 300
 MIN_SEQUENCE_LEN = 20
-N_EPISODE = 100
+N_EPISODE = 21
 
-REF_STATES_PATH = 'data/BW_ref_states.npy'
-ref_states = np.load(REF_STATES_PATH)
+STD_POLICY = 1.0*2
+
+reset_method = 'random'
+
+DUMB_PATH = 'data/dumb_ref_states.npy'
+REF_STATES_PATH = 'data/BW_ref_states2.npy'
+if DUMB_MVT:
+    ref_states = np.load(DUMB_PATH)
+else:
+    ref_states = np.load(REF_STATES_PATH)
+
+# TO DELETE ONCE DEBUG DONE
+#ref_states = np.repeat(ref_states[0,:].reshape(1,-1), len(ref_states), axis=0)
+
 joints_angle_idx = [4,6,9,11]
 joints_vel_idx = [5,7,10,12]
 x_vel_idx = 2
 mean_speed = np.mean(ref_states[:,x_vel_idx])
+
+save_dir = 'save'
+model_path = os.path.join(save_dir, "model.pt")
 
 
 #env = GymEnv("BipedalWalker-v3", device=device, render_mode="rgb_array")
@@ -35,10 +54,104 @@ a_dim = env.action_space.shape[0]
 env = RecordVideo(env, 
                    video_folder="videoRL/",
                    name_prefix="test-video",
-                   episode_trigger=lambda x: x % 10 == 0)
+                   episode_trigger=lambda x: x % 5 == 0
+                   )
 
 class ModifiedRewardWrapper(Wrapper):
-    def __init__(self, env, w_I=0.7, w_G=0.3, w_p=0.65, w_v=0.1, w_e=0.15, w_c=0.1, fall_penalization=20):
+    def __init__(self, env, w_I=0.7, w_G=0.3, w_p=0.65, w_v=0.1, w_e=0.15, w_c=0.1, fall_penalization=20, early_term=False, n_steps_term=40, critic_vel_term=0.1):
+        '''
+        Args:
+        env: gym/torchRL environment
+        w_I: float
+            imitation reward weight
+        w_G: float
+            Goal/Task reward weight
+        w_p: float
+            pose reward weight
+        w_v: float
+            velocity reward weight
+        w_e: float, NOT USED
+            end-effector reward weight
+        w_c: float, NOT USED
+            center of mass reward weight
+        fall_penalization: float
+            reward penalization if the agent falls
+        early_term: bool
+            True for early termination if not enough forward movement
+        n_steps_term: int
+            number of steps on which velocity is averaged to trigger early termination
+        critic_vel_term: float
+            threshold velocity; under this velocity, early termination will be triggered
+        '''
+        super().__init__(env)
+        imitation_sum = w_p+w_v+w_e+w_c  # normalize weights
+        self.w_I = w_I
+        self.w_G = w_G
+        self.w_v = w_v/imitation_sum
+        self.w_p = w_p/imitation_sum
+        self.w_e = w_e/imitation_sum
+        self.w_c = w_c/imitation_sum
+        self.fall_penalization=abs(fall_penalization)
+        self.early_term = early_term
+        self.n_steps_term = n_steps_term
+        self.critic_vel_term = critic_vel_term*self.n_steps_term # to avoid division in mean
+
+        self.step_counter = 0
+        self.mean_vel_list = []
+        self.mean_vel = 1
+    
+    def reset(self):
+        self.step_counter = 0
+        self.mean_vel_list = []
+        self.mean_vel = 1
+        return self.env.reset()
+
+    def step(self, action):
+        obs, reward_base, terminated, truncated, info = self.env.step(action)
+        ref = ref_states[self.step_counter,:]
+
+        task_r = np.exp(-2.5*np.max((0, mean_speed - obs[x_vel_idx]))**2)
+        if reward_base == -100: # robot fell
+            task_r -= self.fall_penalization
+
+        pose_r = np.exp(-2*(
+            np.sum((np.cos(ref[joints_angle_idx])-np.cos(obs[joints_angle_idx]))**2)
+            + np.sum((np.sin(ref[joints_angle_idx])-np.sin(obs[joints_angle_idx]))**2))
+        )
+        vel_r = np.exp(-0.1*np.sum((ref[joints_vel_idx]-obs[joints_vel_idx])**2))
+        end_effector_r = 0
+        center_mass_r = 0
+        imitation_r = (self.w_p*pose_r
+                       + self.w_v*vel_r
+                       + self.w_e*end_effector_r
+                       + self.w_c*center_mass_r)
+
+        reward = self.w_I*imitation_r + self.w_G*task_r
+
+        self.step_counter += 1
+
+        if self.early_term:
+            if self.step_counter < self.n_steps_term:
+                self.mean_vel_list.append(obs[x_vel_idx])
+            elif self.step_counter == self.n_steps_term:
+                self.mean_vel = np.mean(self.mean_vel_list)
+            else:
+                old = self.mean_vel_list.pop(0)
+                self.mean_vel_list.append(obs[x_vel_idx])
+                self.mean_vel += obs[x_vel_idx]-old
+            
+            if self.mean_vel < self.critic_vel_term:
+                terminated = True
+                truncated = True
+        
+        if self.step_counter == len(ref_states)-1:
+            truncated = True
+            terminated = True
+            
+        return obs, reward, terminated, truncated, info # terminated = False to stop early termination
+
+class DumbWrapper(Wrapper):
+    def __init__(self, env, w_I=1., w_G=0., w_p=1., w_v=0., w_e=0., w_c=0., fall_penalization=0):
         '''
         Args:
         env: gym/torchRL environment
@@ -77,34 +190,19 @@ class ModifiedRewardWrapper(Wrapper):
         obs, reward_base, terminated, truncated, info = self.env.step(action)
         ref = ref_states[self.step_counter,:]
 
-        task_r = np.exp(-2.5*np.max((0, mean_speed - obs[x_vel_idx]))**2)
-        if reward_base == -100: # robot fell
-            task_r -= self.fall_penalization
-
         pose_r = np.exp(-2*(
             np.sum((np.cos(ref[joints_angle_idx])-np.cos(obs[joints_angle_idx]))**2)
             + np.sum((np.sin(ref[joints_angle_idx])-np.sin(obs[joints_angle_idx]))**2))
         )
-        vel_r = np.exp(-0.1*np.sum((ref[joints_vel_idx]-obs[joints_vel_idx])**2))
-        end_effector_r = 0
-        center_mass_r = 0
-        imitation_r = (self.w_p*pose_r
-                       + self.w_v*vel_r
-                       + self.w_e*end_effector_r
-                       + self.w_c*center_mass_r)
 
-        reward = self.w_I*imitation_r + self.w_G*task_r
+        imitation_r = self.w_p*pose_r
+
+        reward = self.w_I*imitation_r
 
         self.step_counter += 1
 
+        terminated = False
         return obs, reward, terminated, truncated, info
-
-env = ModifiedRewardWrapper(env, 
-                            w_I=0.65, 
-                            w_G=0.45, 
-                            fall_penalization=10,
-                            w_p=0.5, 
-                            w_v=0.5) # un-comment once Wrapper is done
 
 ### Policy Network & Value Network Construction ###
 
@@ -207,9 +305,6 @@ class ValueNet(nn.Module):
                                       hidden_size=hidden_size,
                                       method=method)
 
-policy_net = PolicyNet(s_dim, a_dim, std=1.)
-value_net = ValueNet(s_dim)
-
 
 ### Environment Runner Construction ###
 
@@ -309,8 +404,6 @@ class EnvRunner:
                 mb_returns, \
                 self.mb_rewards[:episode_len]
 
-runner = EnvRunner(s_dim, a_dim)
-
 ### PPO Algorithm ###
 
 class PPO:
@@ -339,7 +432,7 @@ class PPO:
         mb_old_a_logps = torch.from_numpy(mb_old_a_logps).to(self.device)
         episode_length = len(mb_states)
 
-        k = int(np.log2(episode_length/MIN_SEQUENCE_LEN))
+        k = int(abs(np.log2(episode_length/MIN_SEQUENCE_LEN)))
         sample_n_mb = 2**k
         sequence_length = int(episode_length/sample_n_mb)
         if sequence_length >= episode_length:
@@ -360,8 +453,8 @@ class PPO:
             
             #Randomly sample a batch for training
             v_loss, pg_loss = 0, 0
-            self.policy_net.reset_hidden_states(hidden_size=sample_n_mb, method='random')
-            self.value_net.reset_hidden_states(hidden_size=sample_n_mb, method='random')
+            self.policy_net.reset_hidden_states(hidden_size=sample_n_mb, method=reset_method)
+            self.value_net.reset_hidden_states(hidden_size=sample_n_mb, method=reset_method)
             for t in range(sequence_length):
                 sample_states = mb_states[sample_idx]
                 sample_actions = mb_actions[sample_idx]
@@ -397,12 +490,8 @@ class PPO:
 
         return pg_loss.item(), v_loss.item(), ent.item()
 
-agent = PPO(policy_net, value_net)
-
 
 ### Training and Testing Process ###
-
-
 def play(policy_net):
 
     with torch.no_grad():
@@ -415,7 +504,7 @@ def play(policy_net):
             #state_tensor = torch.tensor(np.expand_dims(state, axis=0), dtype=torch.float32, device='cpu')
             state_tensor = torch.tensor(state, dtype=torch.float32, device='cpu')
             #state_tensor = torch.tensor(state.expand(1), dtype=torch.float32, device='cpu')
-            action = policy_net.choose_action(state_tensor, deterministic=True).cpu().numpy()
+            action = policy_net.choose_action(state_tensor, deterministic=False).cpu().numpy()
             if action.ndim > 1:
                 state, reward, done, truncated, info = env.step(action[0])
             else:
@@ -440,15 +529,15 @@ def train(env, runner, policy_net, value_net, agent, max_episode=N_EPISODE):
     for i in range(max_episode):
         #Run an episode to collect data
         with torch.no_grad():
-            policy_net.reset_hidden_states(hidden_size=0)
-            value_net.reset_hidden_states(hidden_size=0)
+            policy_net.reset_hidden_states(hidden_size=0, method=reset_method)
+            value_net.reset_hidden_states(hidden_size=0, method=reset_method)
             mb_states, mb_actions, mb_old_a_logps, mb_values, mb_returns, mb_rewards = runner.run(env, policy_net, value_net)
             mb_advs = mb_returns - mb_values
             mb_advs = (mb_advs - mb_advs.mean()) / (mb_advs.std() + 1e-6)
         
         #Train the model using the collected data
-        policy_net.reset_hidden_states()
-        value_net.reset_hidden_states() # need batched data as agent.train evaluates BrainRNN on [B,...] samples from the episode
+        policy_net.reset_hidden_states(method=reset_method)
+        value_net.reset_hidden_states(method=reset_method) # need batched data as agent.train evaluates BrainRNN on [B,...] samples from the episode
         pg_loss, v_loss, ent = agent.train(mb_states, mb_actions, mb_values, mb_advs, mb_returns, mb_old_a_logps)
         mean_total_reward += mb_rewards.sum()
         mean_length += len(mb_states)
@@ -475,23 +564,53 @@ def train(env, runner, policy_net, value_net, agent, max_episode=N_EPISODE):
             mean_total_reward = 0
             mean_length = 0
 
-train(env, runner, policy_net, value_net, agent)
+if __name__ == '__main__':
+    ### Training/Evaluation
+    policy_net = PolicyNet(s_dim, a_dim, std=STD_POLICY)
+    value_net = ValueNet(s_dim)
+    runner = EnvRunner(s_dim, a_dim)
+    agent = PPO(policy_net, value_net)
 
-torch.save({
-    "PolicyNet": policy_net.state_dict(),
-}, os.path.join('save', "model.pt"))
-env.close()
+    if TRAIN:
+        if DUMB_MVT:
+            env = DumbWrapper(env)
+        else:
+            env = ModifiedRewardWrapper(env, 
+                                   w_I=0.8, 
+                                   w_G=0.2, 
+                                   fall_penalization=5,
+                                   w_p=0.35, 
+                                   w_v=0.65,
+                                   early_term=False,
+                                   n_steps_term=40,
+                                   critic_vel_term=0)
+        if CONTINUE_TRAINING: # load precedent saved models
+            if os.path.exists(model_path):
+                print("Loading the model ... ", end="")
+                checkpoint = torch.load(model_path)
+                policy_net.load_state_dict(checkpoint["PolicyNet"])
+                value_net.load_state_dict(checkpoint["ValueNet"])
+                print("Done.")
+            else:
+                print('ERROR: No model saved')
 
-save_dir = 'save'
-model_path = os.path.join(save_dir, "model.pt")
+        train(env, runner, policy_net, value_net, agent)
+        torch.save({
+            "PolicyNet": policy_net.state_dict(),
+            "ValueNet": value_net.state_dict()
+        }, os.path.join('save', "model.pt"))
+        env.close()
 
-if os.path.exists(model_path):
-    print("Loading the model ... ", end="")
-    checkpoint = torch.load(model_path)
-    policy_net.load_state_dict(checkpoint["PolicyNet"])
-    print("Done.")
-else:
-    print('ERROR: No model saved')
+    else:
+        if os.path.exists(model_path):
+            print("Loading the model ... ", end="")
+            checkpoint = torch.load(model_path)
+            policy_net.load_state_dict(checkpoint["PolicyNet"])
+            print("Done.")
+        else:
+            print('ERROR: No model saved')
 
-policy_net.reset_hidden_states(hidden_size=0)
-play(policy_net)
+        #policy_net.main.batch_size = 0
+        #hidden_states = policy_net.main.hidden_states[5,:]
+        policy_net.reset_hidden_states(hidden_size=0, method=reset_method)
+        play(policy_net)

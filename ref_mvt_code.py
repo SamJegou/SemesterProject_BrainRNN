@@ -5,10 +5,15 @@ import torch.nn as nn
 import numpy as np
 from gymnasium.wrappers.record_video import RecordVideo
 
+from RL_bipedal_hand import ModifiedRewardWrapper
 
 
-model_path = 'models/ref_mvt.pt'
-REF_STATES_PATH = 'data/BW_ref_states.npy'
+DUMB_MVT = False
+DUMB_PATH = 'data/dumb_ref_states.npy'
+freq = 1.
+
+model_path = 'models/ref_mvt2.pt'
+REF_STATES_PATH = 'data/BW_ref_states2.npy'
 
 MAX_STEPS = 1600
 env = gym.make("BipedalWalker-v3",
@@ -19,7 +24,16 @@ env = RecordVideo(env,
                    video_folder="videoRL/",
                    name_prefix="reference",
                    episode_trigger=lambda x: x % 5 == 0)
-
+env = ModifiedRewardWrapper(env, 
+                            w_I=0.8, 
+                            w_G=0.2, 
+                            fall_penalization=5,
+                            w_p=0.5, 
+                            w_v=0.5,
+                            early_term=False,
+                            n_steps_term=40,
+                            critic_vel_term=0
+                            )
 s_dim = env.observation_space.shape[0]
 a_dim = env.action_space.shape[0]
 
@@ -154,15 +168,25 @@ class PolicyNet(nn.Module):
         return dist.log_probs(action), dist.entropy()
 
 if __name__ == '__main__':
-    policy_net = PolicyNet(s_dim, a_dim)
-    if os.path.exists(model_path):
-        print("Loading the model ... ", end="")
-        checkpoint = torch.load(model_path)
-        policy_net.load_state_dict(checkpoint["PolicyNet"])
-        print("Done.")
+    if DUMB_MVT:
+        res = np.zeros((510, 24))
+        omega_t = 2*np.pi*freq*np.linspace(0,510*4//200, 510) # 200 steps <-> 4sec
+        joints_angle_idx = [4,6,9,11]
+        joints_vel_idx = [5,7,10,12]
+        res[:,6] = omega_t
+        res[100:,11] = 0
+
+        np.save(DUMB_PATH, res)
     else:
-        print('ERROR: No model saved')
-    
-    #play(policy_net)
-    save_states(policy_net)
+        policy_net = PolicyNet(s_dim, a_dim)
+        if os.path.exists(model_path):
+            print("Loading the model ... ", end="")
+            checkpoint = torch.load(model_path)
+            policy_net.load_state_dict(checkpoint["PolicyNet"])
+            print("Done.")
+        else:
+            print('ERROR: No model saved')
+
+        #play(policy_net)
+        save_states(policy_net)
     

@@ -7,8 +7,11 @@ from torch.utils.data import Dataset, DataLoader
 
 from settings import *
 
+def exp_std(w, max_w=np.max(adj_mat), std_lim = 3, a=2):
+    return std_lim*np.exp((w/max_w-1)*a)
+
 class BrainRNN(nn.Module):
-    def __init__(self, input_size, output_size, adj_mat, layers, activation=torch.sigmoid, batch_size=8):
+    def __init__(self, input_size, output_size, adj_mat, layers, activation=torch.sigmoid, batch_size=8, weights_from_connectome='normal', std_fct=exp_std):
         super(BrainRNN, self).__init__()
         self.input_size = input_size
         self.output_size = output_size
@@ -24,7 +27,7 @@ class BrainRNN(nn.Module):
 
         # Create forward hidden layers
         self.hidden_layers = nn.ModuleList([])
-        for i in range(len(self.layers)-1):
+        for i in range(len(self.layers)-1): # hidden_layers[i] = layer i to i+1
             new_layer = nn.Linear(len(self.layers[i]),len(self.layers[i+1]))
             mask = self.adj_mat[np.ix_(self.layers[i],self.layers[i+1])] # connections from layer i to layer i+1
             prune.custom_from_mask(new_layer, name='weight', mask=torch.tensor(mask.T)) # delete fictive connections
@@ -34,30 +37,68 @@ class BrainRNN(nn.Module):
         # Create the backward weights
         self.recurrent_layers = nn.ModuleList([]) # recurrent_layers[i](hidden_states) = layer j>i to i
         for i in range(len(self.layers)-1): # last layer should not have incomming reccurent connections
-            # Find the backward connections to layer i
-            nodes, nodes_layer = np.where(self.adj_mat[self.layers[i][-1]+1:,self.layers[i]]==1)
-            
+            # Find the backward connections to layer i           
             new_layer = nn.Linear(self.n_neurons, len(self.layers[i]), bias=False) # no bias for backward connection
-            mask = self.adj_mat[:,self.layers[i]]
+            mask = self.adj_mat[:,self.layers[i]] # all layers to i
+            mask[np.concatenate(layers[:i+1])] = 0 # remove j<=i to i -> keep only j>i to i
             prune.custom_from_mask(new_layer, name='weight', mask=torch.tensor(mask.T)) # delete fictive connections
             # prune.remove(new_layer, 'weight') # makes pruning permanent but removes mask -> trainable weights
             self.recurrent_layers.append(new_layer)
         
         # create skip connections
-        nb_nodes = len(self.layers[0])+len(self.layers[1]) # nb nodes in 2 first layers
-        self.skip_layers = nn.ModuleList([]) # skip_layers[i](hidden_states) = layer j<i to hidden layer i+1
+        nb_nodes = len(self.layers[0]) # nb nodes in 2 first layers
+        self.skip_layers = nn.ModuleList([]) # skip_layers[i](layers<i-1) = layer j<=i to i+2
         for i in range(2,len(self.layers)): # first 2 layers should not have skip connections
-            # Find the backward connections to layer i
-            nodes, nodes_layer = np.where(self.adj_mat[:self.layers[i][0],self.layers[i]]==1)
+            # Find the skip connections to layer i
             new_layer = nn.Linear(nb_nodes, len(self.layers[i]), bias=False) # no bias for skip connection
-            mask = self.adj_mat[:nb_nodes,self.layers[i]]
+            mask = self.adj_mat[np.concatenate(layers[:i-1])][:,self.layers[i]] # layers j<i-1 to i
             prune.custom_from_mask(new_layer, name='weight', mask=torch.tensor(mask.T)) # delete fictive connections
             # prune.remove(new_layer, 'weight') # makes pruning permanent but removes mask -> trainable weights
             self.skip_layers.append(new_layer)
-            nb_nodes += len(self.layers[i])
+            nb_nodes += len(self.layers[i-1])
 
         # Create the output layer
         self.output_layer = nn.Linear(len(self.layers[-1]), output_size)
+
+        if weights_from_connectome:
+            self.init_connectome_weights(std_fct=std_fct, law=weights_from_connectome)
+    
+    def init_connectome_weights(self, std_fct=exp_std, law='uniform', additive=True):
+        '''
+        Random weight to follow connectome measurments
+
+        std_fct: func
+            function of the nb of synapses, that outputs ~std of weight
+        law: str
+            uniform or normal, for the law to initialize weights
+        additive: bool
+            True -> law centered on std_fct(nb_synapses), default std
+            False -> law centered on 0 with std = std_fct(nb_synapses)
+        '''
+        if law == 'uniform':
+            rand = (np.random.rand(*self.adj_mat.shape)-1/2)*2
+        elif law == 'normal':
+            rand = np.random.normal(0,1,self.adj_mat.shape)
+
+        if additive:
+            signs = np.random.binomial(n=1, p=0.5, size=self.adj_mat.shape)
+            all_weights = signs*exp_std(self.adj_mat)+rand
+        else:
+            all_weights = exp_std(self.adj_mat)*rand
+        #forward layers
+        for i in range(len(self.layers)-1):
+            layer = self.recurrent_layers[i]
+            layer.weight = torch.tensor(all_weights[self.layers[i]][:,self.layers[i]], requires_grad=True)
+        # recurrent layers
+        for i in range(len(self.layers)-1):
+            layer = self.hidden_layers[i]
+            weights = all_weights[:,self.layers[i+1]]
+            weights[np.concatenate(layers[:i+1])] = 0
+            layer.weight = torch.tensor(weights, requires_grad=True)
+        # skip layers
+        for i in range(2,len(self.layers)):
+            layer = self.skip_layers[i-2]
+            layer.weight = torch.tensor(all_weights[np.concatenate(layers[:i-1])][:,self.layers[i]], requires_grad=True)
 
     def forward(self, x):
         next_hidden_states = torch.empty(x.shape[0], self.n_neurons) if x.dim() > 1 else torch.empty(self.n_neurons)
@@ -73,11 +114,11 @@ class BrainRNN(nn.Module):
             if i == 0: # no skip connection from layer 0 to 1
                 x = self.hidden_layers[i](x) + self.recurrent_layers[i+1](self.hidden_states)
             elif i == len(self.layers)-2: # no recurrent connection for last hidden layer
-                x = self.hidden_layers[i](x) + self.skip_layers[i-1](torch.concat(skips, dim=-1)) 
+                x = self.hidden_layers[i](x) + self.skip_layers[i-1](torch.concat(skips[:-1], dim=-1)) 
             else:
                 x = (self.hidden_layers[i](x) 
                      + self.recurrent_layers[i+1](self.hidden_states)
-                     + self.skip_layers[i-1](torch.concat(skips, dim=-1))
+                     + self.skip_layers[i-1](torch.concat(skips[:-1], dim=-1)) ## skips a pas la bonne dimension
                 )
             x = self.activation(x)
             next_hidden_states[...,self.layers[i+1]] = x
@@ -90,7 +131,7 @@ class BrainRNN(nn.Module):
 
         return x
 
-    def reset_hidden_states(self, hidden_states=None, hidden_size=None, method='zero'):
+    def reset_hidden_states(self, hidden_states=None, hidden_size=None, method='random'):
         if hidden_size is None:
             hidden_size = self.batch_size
         if hidden_states is None:
@@ -108,8 +149,8 @@ class BrainRNN(nn.Module):
                 raise NotImplementedError('Only method "zero" and "random" are implemented.')
         else:
             if self.batch_size > 0:
-                assert hidden_states.shape == (self.n_neurons, hidden_size), \
-                    f'hidden_states should have shape {(self.n_neurons, hidden_size)}; received {hidden_states.shape}'
+                assert hidden_states.shape == (hidden_size, self.n_neurons), \
+                    f'hidden_states should have shape {(hidden_size, self.n_neurons)}; received {hidden_states.shape}'
             else:
                 assert hidden_states.shape == (self.n_neurons,), \
                     f'hidden_states should have shape {(self.n_neurons,)}; received {hidden_states.shape}'

@@ -22,18 +22,30 @@ V Modify reward function to have something ~like deepmimic & help training -> OB
 
 V modifier PPO.train -> on doit voir trop de fois les mêmes step avec la méthode actuelle
 
-- Modifier reward pour que ce soit indépendant (?) de la taille de l'épisode -> pour le moment, rester debout sans avancer rapporte pas mal de reward
-- Modifier les poids task/imitation 
+~V Truncated BPTT -> faster run // Already implemented in ¨PPO with sample_mb ?
+~V Modifier les poids task/imitation 
+~V see how to reset hidden states -> ~fixed initialization to have stability in learning ? -> Random seems to perform better
+
+- REVOIR LAYERS DANS BRAINRNN -> recurrent and skip avaient un ==1 au lieu de >0 ET GROS PBM SUR QUELLES CONNECTIONS CHOISIES !!!
+
+- Train sur un mouvement nul (oscillations, jambes tendues) pour voir si le training marche-> Pbm de video qui s'arête...
 
 - Ajuster les poids initiaux de BrainRNN en fonction des weights de adj_mat
 
+- Modifier reward pour que ce soit indépendant (?) de la taille de l'épisode -> pour le moment, rester debout sans avancer rapporte pas mal de reward
+    -> Plutôt early termination sur mouvement bloqué & durée épisode plus grande pour récompenser ceux qui vont loin
+
 - Modifier output layer pour avoir (potentiellement) tous les neurones qui puissent arriver aux motorneurons (voir avec Sibo)
 
-- see how to reset hidden states -> ~fixed initialization to have stability in learning ?
-- 0 MotroNeuron with target = LegNpT1_L => empty layer at the end of the graph => Error
 
-- Truncated BPTT -> faster run // Already implemented in ¨PPO with sample_mb ?
+- 0 MotroNeuron with target = LegNpT1_L => empty layer at the end of the graph => Error
 
 
 Training:
-- init random: marche mieux que 0
+- init random: marche mieux que 0 (avant avoir changé de std)
+- std in policy_net:
+    - std = 0.1 => keeps doing the same mvt
+    - std = 2 or 3 => more mvt exploration, some very good sequences
+
+Rq:
+- Leg 1 = claire ; Leg 2 = Foncée

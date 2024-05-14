@@ -102,6 +102,9 @@ if PROCESS: # organization in layers
     if len(MN_idx) != 0: #pbm of 0 MN
         layers.append(MN_idx)
     
+    for layer in layers:
+        layer.sort()
+    
     with open(DATA_FOLDER+SAVE_NAME_LAYERS, 'w') as file:
         json.dump(layers, file)
     print('Graph organized in layers')
