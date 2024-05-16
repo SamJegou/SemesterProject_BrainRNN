@@ -11,7 +11,7 @@ def exp_std(w, max_w=np.max(adj_mat), std_lim = 3, a=2):
     return std_lim*np.exp((w/max_w-1)*a)
 
 class BrainRNN(nn.Module):
-    def __init__(self, input_size, output_size, adj_mat, layers, activation=torch.sigmoid, batch_size=8, weights_from_connectome='normal', std_fct=exp_std):
+    def __init__(self, input_size, output_size, adj_mat, layers, activation=torch.sigmoid, batch_size=8, weights_from_connectome='uniform', std_fct=exp_std):
         super(BrainRNN, self).__init__()
         self.input_size = input_size
         self.output_size = output_size
@@ -70,7 +70,7 @@ class BrainRNN(nn.Module):
         std_fct: func
             function of the nb of synapses, that outputs ~std of weight
         law: str
-            uniform or normal, for the law to initialize weights
+            uniform (-1,1) or normal(0,1), for the law to initialize weights
         additive: bool
             True -> law centered on std_fct(nb_synapses), default std
             False -> law centered on 0 with std = std_fct(nb_synapses)

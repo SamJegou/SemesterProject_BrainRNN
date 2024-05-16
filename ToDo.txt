@@ -26,11 +26,20 @@ V modifier PPO.train -> on doit voir trop de fois les mêmes step avec la métho
 ~V Modifier les poids task/imitation 
 ~V see how to reset hidden states -> ~fixed initialization to have stability in learning ? -> Random seems to perform better
 
-- REVOIR LAYERS DANS BRAINRNN -> recurrent and skip avaient un ==1 au lieu de >0 ET GROS PBM SUR QUELLES CONNECTIONS CHOISIES !!!
+V REVOIR LAYERS DANS BRAINRNN -> recurrent and skip avaient un ==1 au lieu de >0 ET GROS PBM SUR QUELLES CONNECTIONS CHOISIES !!!
 
-- Train sur un mouvement nul (oscillations, jambes tendues) pour voir si le training marche-> Pbm de video qui s'arête...
+X Train sur un mouvement nul (oscillations, jambes tendues) pour voir si le training marche-> Pbm de video qui s'arête...
 
-- Ajuster les poids initiaux de BrainRNN en fonction des weights de adj_mat
+V Ajuster les poids initiaux de BrainRNN en fonction des weights de adj_mat
+
+V save rewards of training !
+
+- link input feedback to more nodes (random with different nb targeted nodes, and see how well the network performs)
+
+- run on Scitas:
+    - have a .run file (as Sibo sent)
+    - possible to put many (python my_script.py arg1   -new line-   python my_script.py arg2, etc)
+    V ATTENTION nom de fichier enregistrés ! -> -f argument (suffixe to filename)
 
 - Modifier reward pour que ce soit indépendant (?) de la taille de l'épisode -> pour le moment, rester debout sans avancer rapporte pas mal de reward
     -> Plutôt early termination sur mouvement bloqué & durée épisode plus grande pour récompenser ceux qui vont loin

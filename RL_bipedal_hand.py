@@ -5,6 +5,7 @@ import numpy as np
 import gymnasium as gym
 from gymnasium import Wrapper
 from gymnasium.wrappers.record_video import RecordVideo
+import argparse
 
 from settings import *
 from BrainRNN import BrainRNN
@@ -19,7 +20,7 @@ device = torch.device("cpu") #torch.device("cuda" if torch.cuda.is_available() e
 
 MAX_STEPS = 300
 MIN_SEQUENCE_LEN = 20
-N_EPISODE = 21
+N_EPISODE = 400
 
 STD_POLICY = 1.0*2
 
@@ -32,8 +33,28 @@ if DUMB_MVT:
 else:
     ref_states = np.load(REF_STATES_PATH)
 
-# TO DELETE ONCE DEBUG DONE
-#ref_states = np.repeat(ref_states[0,:].reshape(1,-1), len(ref_states), axis=0)
+w_I=0.8
+w_G=0.2
+w_p=0.7
+w_v=0.3
+
+parser = argparse.ArgumentParser(
+                prog='RL_bipedal',
+                description='Train a BrainRNN RL agent on Bipedal Walker'
+                )
+parser.add_argument('-N', '--N_episode', default=N_EPISODE, help='total number of episodes during the training')
+parser.add_argument('-S', '--Step', default=MAX_STEPS, help='maximal number of steps in an episode')
+parser.add_argument('--min_seq_len', default=MIN_SEQUENCE_LEN, help='minimal length of a sequence for learning process')
+parser.add_argument('--w_I', default=w_I)
+parser.add_argument('--w_G', default=w_G)
+parser.add_argument('--w_p', default=w_p)
+parser.add_argument('--w_v', default=w_v)
+parser.add_argument('-f', '--filename_suffixe',
+                    default='',
+                    help='suffixe to add to the saved files from this run')
+args = parser.parse_args()
+
+
 
 joints_angle_idx = [4,6,9,11]
 joints_vel_idx = [5,7,10,12]
@@ -41,20 +62,20 @@ x_vel_idx = 2
 mean_speed = np.mean(ref_states[:,x_vel_idx])
 
 save_dir = 'save'
-model_path = os.path.join(save_dir, "model.pt")
+model_path = os.path.join(save_dir, "model"+args.f+".pt")
 
 
 #env = GymEnv("BipedalWalker-v3", device=device, render_mode="rgb_array")
 env = gym.make("BipedalWalker-v3",
                render_mode="rgb_array",
-               max_episode_steps=MAX_STEPS)
+               max_episode_steps=args.Step)
 s_dim = env.observation_space.shape[0]
 a_dim = env.action_space.shape[0]
 
 env = RecordVideo(env, 
                    video_folder="videoRL/",
                    name_prefix="test-video",
-                   episode_trigger=lambda x: x % 5 == 0
+                   episode_trigger=lambda x: x % 10 == 0
                    )
 
 class ModifiedRewardWrapper(Wrapper):
@@ -518,10 +539,13 @@ def play(policy_net):
     #env.play()
     env.close()
 
-def train(env, runner, policy_net, value_net, agent, max_episode=N_EPISODE):
+def train(env, runner, policy_net, value_net, agent, max_episode=args.N):
     mean_total_reward = 0
     mean_length = 0
     save_dir = 'train'
+
+    all_rewards = np.zeros(max_episode)
+    all_steps = np.zeros(max_episode)
 
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
@@ -534,7 +558,10 @@ def train(env, runner, policy_net, value_net, agent, max_episode=N_EPISODE):
             mb_states, mb_actions, mb_old_a_logps, mb_values, mb_returns, mb_rewards = runner.run(env, policy_net, value_net)
             mb_advs = mb_returns - mb_values
             mb_advs = (mb_advs - mb_advs.mean()) / (mb_advs.std() + 1e-6)
-        
+
+        all_rewards[i] = mb_rewards.sum()
+        all_steps[i] = len(mb_states)
+
         #Train the model using the collected data
         policy_net.reset_hidden_states(method=reset_method)
         value_net.reset_hidden_states(method=reset_method) # need batched data as agent.train evaluates BrainRNN on [B,...] samples from the episode
@@ -557,12 +584,14 @@ def train(env, runner, policy_net, value_net, agent, max_episode=N_EPISODE):
                 "it": i,
                 "PolicyNet": policy_net.state_dict(),
                 "ValueNet": value_net.state_dict()
-            }, os.path.join(save_dir, "model.pt"))
+            }, os.path.join(save_dir, "model"+args.f+".pt"))
             print("Done.")
             print()
             #play(policy_net)
             mean_total_reward = 0
             mean_length = 0
+        
+    return all_rewards, all_steps
 
 if __name__ == '__main__':
     ### Training/Evaluation
@@ -576,11 +605,11 @@ if __name__ == '__main__':
             env = DumbWrapper(env)
         else:
             env = ModifiedRewardWrapper(env, 
-                                   w_I=0.8, 
-                                   w_G=0.2, 
+                                   w_I=args.w_I, 
+                                   w_G=args.w_G, 
                                    fall_penalization=5,
-                                   w_p=0.35, 
-                                   w_v=0.65,
+                                   w_p=args.w_p, 
+                                   w_v=args.w_v,
                                    early_term=False,
                                    n_steps_term=40,
                                    critic_vel_term=0)
@@ -594,12 +623,16 @@ if __name__ == '__main__':
             else:
                 print('ERROR: No model saved')
 
-        train(env, runner, policy_net, value_net, agent)
+        rewards, steps = train(env, runner, policy_net, value_net, agent)
+
         torch.save({
             "PolicyNet": policy_net.state_dict(),
             "ValueNet": value_net.state_dict()
         }, os.path.join('save', "model.pt"))
         env.close()
+
+        np.save('train/rewards'+args.f+'.npy', rewards)
+        np.save('train/steps'+args.f+'.npy', steps)
 
     else:
         if os.path.exists(model_path):
