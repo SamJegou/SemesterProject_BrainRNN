@@ -20,11 +20,16 @@ device = torch.device("cpu") #torch.device("cuda" if torch.cuda.is_available() e
 
 MAX_STEPS = 300
 MIN_SEQUENCE_LEN = 20
-N_EPISODE = 20
+N_EPISODE = 200
 
 STD_POLICY = 1.0*2
 
-reset_method = 'random'
+weights_from_connectome = 'normal'
+weights_additive = True
+
+n_inputs = None
+
+SAVE_VIDEO = 10 # save video of training all ... episodes
 
 DUMB_PATH = 'data/dumb_ref_states.npy'
 REF_STATES_PATH = 'data/BW_ref_states2.npy'
@@ -42,16 +47,20 @@ parser = argparse.ArgumentParser(
                 prog='RL_bipedal',
                 description='Train a BrainRNN RL agent on Bipedal Walker'
                 )
-parser.add_argument('-N', '--N_episode', default=N_EPISODE, help='total number of episodes during the training')
-parser.add_argument('-S', '--Step', default=MAX_STEPS, help='maximal number of steps in an episode')
-parser.add_argument('--min_seq_len', default=MIN_SEQUENCE_LEN, help='minimal length of a sequence for learning process')
-parser.add_argument('--w_I', default=w_I)
-parser.add_argument('--w_G', default=w_G)
-parser.add_argument('--w_p', default=w_p)
-parser.add_argument('--w_v', default=w_v)
-parser.add_argument('-f', '--filename_suffixe',
+parser.add_argument('-N', '--N_episode', type=int, default=N_EPISODE, help='total number of episodes during the training')
+parser.add_argument('-S', '--Step', type=int, default=MAX_STEPS, help='maximal number of steps in an episode')
+parser.add_argument('--min_seq_len', type=int, default=MIN_SEQUENCE_LEN, help='minimal length of a sequence for learning process')
+parser.add_argument('--w_I', type=float, default=w_I)
+parser.add_argument('--w_G', type=float, default=w_G)
+parser.add_argument('--w_p', type=float, default=w_p)
+parser.add_argument('--w_v', type=float, default=w_v)
+parser.add_argument('-f', '--filename_suffixe', type=str,
                     default='',
                     help='suffixe to add to the saved files from this run')
+parser.add_argument('--n_inputs', type=float, default=n_inputs, help='Number or fraction of nodes receiving the input. None if 1st layer is input.')
+parser.add_argument('--weights_law', type=str, default=weights_from_connectome, help='uniform/normal/False; method to initialize weights')
+parser.add_argument('--weights_additive', type=str, default=weights_additive, help='non-centered & short (True) or centered and wide (False) law for weights initialization')
+parser.add_argument('--save_video', type=int, default=SAVE_VIDEO, help='save video of training all ... episodes')
 args = parser.parse_args()
 
 
@@ -75,7 +84,7 @@ a_dim = env.action_space.shape[0]
 env = RecordVideo(env, 
                    video_folder="videoRL/",
                    name_prefix="test-video",
-                   episode_trigger=lambda x: x % 10 == 0
+                   episode_trigger=lambda x: x % args.save_video == 0
                    )
 
 class ModifiedRewardWrapper(Wrapper):
@@ -270,7 +279,11 @@ class PolicyNet(nn.Module):
                              output_size,
                              adj_mat,
                              layers,
-                             batch_size=batch_size)
+                             batch_size=batch_size,
+                             weights_from_connectome=args.weights_law,
+                             additive=args.weights_additive,
+                             n_input_nodes=args.n_inputs
+                             )
         self.dist = DiagGaussian(output_size, a_dim, std=std)
     
     #Forward pass
@@ -301,10 +314,9 @@ class PolicyNet(nn.Module):
         dist = self.dist(feature)
         return dist.log_probs(action), dist.entropy()
 
-    def reset_hidden_states(self, hidden_states=None, hidden_size=None, method='zero'):
+    def reset_hidden_states(self, hidden_states=None, hidden_size=None):
         self.main.reset_hidden_states(hidden_states=hidden_states,
-                                      hidden_size=hidden_size,
-                                      method=method)
+                                      hidden_size=hidden_size)
 
 #Value Network
 class ValueNet(nn.Module):
@@ -315,16 +327,19 @@ class ValueNet(nn.Module):
                              1,
                              adj_mat,
                              layers,
-                             batch_size=batch_size)
+                             batch_size=batch_size,
+                             weights_from_connectome=args.weights_law,
+                             additive=args.weights_additive,
+                             n_input_nodes=args.n_inputs
+                             )
     
     #Forward pass
     def forward(self, state):
         return self.main(state)[..., 0]
 
-    def reset_hidden_states(self, hidden_states=None, hidden_size=None, method='zero'):
+    def reset_hidden_states(self, hidden_states=None, hidden_size=None):
         self.main.reset_hidden_states(hidden_states=hidden_states,
-                                      hidden_size=hidden_size,
-                                      method=method)
+                                      hidden_size=hidden_size)
 
 
 ### Environment Runner Construction ###
@@ -429,7 +444,7 @@ class EnvRunner:
 
 class PPO:
     #Constructor
-    def __init__(self, policy_net, value_net, lr=1e-4, max_grad_norm=0.5, ent_weight=0.01, clip_val=0.2, sample_n_epoch=4, sample_mb_size=batch_size, max_seq_len=MIN_SEQUENCE_LEN, device='cpu'):
+    def __init__(self, policy_net, value_net, lr=1e-4, max_grad_norm=0.5, ent_weight=0.01, clip_val=0.2, sample_n_epoch=4, min_seq_len=MIN_SEQUENCE_LEN, sample_mb_size=batch_size, device='cpu'):
         self.policy_net = policy_net
         self.value_net = value_net
         self.max_grad_norm = max_grad_norm
@@ -440,7 +455,7 @@ class PPO:
         self.device = device
         self.opt_polcy = torch.optim.Adam(policy_net.parameters(), lr)
         self.opt_value = torch.optim.Adam(value_net.parameters(), lr)
-        self.max_seq_len = max_seq_len # maximal length of a sequence passed in RNN
+        self.min_seq_len = min_seq_len
     
     #Train the policy net & value net using PPO
     def train(self, mb_states, mb_actions, mb_old_values, mb_advs, mb_returns, mb_old_a_logps):
@@ -453,18 +468,11 @@ class PPO:
         mb_old_a_logps = torch.from_numpy(mb_old_a_logps).to(self.device)
         episode_length = len(mb_states)
 
-        k = int(abs(np.log2(episode_length/MIN_SEQUENCE_LEN)))
+        k = int(abs(np.log2(episode_length/self.min_seq_len)))
         sample_n_mb = 2**k
         sequence_length = int(episode_length/sample_n_mb)
         if sequence_length >= episode_length:
             sequence_length = episode_length//2
-        #sample_n_mb = (episode_length-self.max_seq_len)//self.sample_mb_size
-
-        #if sample_n_mb <= 0:
-        #    sample_n_mb = 1
-        #    max_seq_len = episode_length//2
-        #else:
-        #    max_seq_len = self.max_seq_len
 
 
         for i in range(self.sample_n_epoch):
@@ -474,8 +482,8 @@ class PPO:
             
             #Randomly sample a batch for training
             v_loss, pg_loss = 0, 0
-            self.policy_net.reset_hidden_states(hidden_size=sample_n_mb, method=reset_method)
-            self.value_net.reset_hidden_states(hidden_size=sample_n_mb, method=reset_method)
+            self.policy_net.reset_hidden_states(hidden_size=sample_n_mb)
+            self.value_net.reset_hidden_states(hidden_size=sample_n_mb)
             for t in range(sequence_length):
                 sample_states = mb_states[sample_idx]
                 sample_actions = mb_actions[sample_idx]
@@ -553,8 +561,8 @@ def train(env, runner, policy_net, value_net, agent, max_episode=args.N_episode)
     for i in range(max_episode):
         #Run an episode to collect data
         with torch.no_grad():
-            policy_net.reset_hidden_states(hidden_size=0, method=reset_method)
-            value_net.reset_hidden_states(hidden_size=0, method=reset_method)
+            policy_net.reset_hidden_states(hidden_size=0)
+            value_net.reset_hidden_states(hidden_size=0)
             mb_states, mb_actions, mb_old_a_logps, mb_values, mb_returns, mb_rewards = runner.run(env, policy_net, value_net)
             mb_advs = mb_returns - mb_values
             mb_advs = (mb_advs - mb_advs.mean()) / (mb_advs.std() + 1e-6)
@@ -563,8 +571,8 @@ def train(env, runner, policy_net, value_net, agent, max_episode=args.N_episode)
         all_steps[i] = len(mb_states)
 
         #Train the model using the collected data
-        policy_net.reset_hidden_states(method=reset_method)
-        value_net.reset_hidden_states(method=reset_method) # need batched data as agent.train evaluates BrainRNN on [B,...] samples from the episode
+        policy_net.reset_hidden_states()
+        value_net.reset_hidden_states() # need batched data as agent.train evaluates BrainRNN on [B,...] samples from the episode
         pg_loss, v_loss, ent = agent.train(mb_states, mb_actions, mb_values, mb_advs, mb_returns, mb_old_a_logps)
         mean_total_reward += mb_rewards.sum()
         mean_length += len(mb_states)
@@ -597,8 +605,8 @@ if __name__ == '__main__':
     ### Training/Evaluation
     policy_net = PolicyNet(s_dim, a_dim, std=STD_POLICY)
     value_net = ValueNet(s_dim)
-    runner = EnvRunner(s_dim, a_dim)
-    agent = PPO(policy_net, value_net)
+    runner = EnvRunner(s_dim, a_dim, max_step=args.Step)
+    agent = PPO(policy_net, value_net, min_seq_len=args.min_seq_len)
 
     if TRAIN:
         if DUMB_MVT:
@@ -645,5 +653,5 @@ if __name__ == '__main__':
 
         #policy_net.main.batch_size = 0
         #hidden_states = policy_net.main.hidden_states[5,:]
-        policy_net.reset_hidden_states(hidden_size=0, method=reset_method)
+        policy_net.reset_hidden_states(hidden_size=0)
         play(policy_net)

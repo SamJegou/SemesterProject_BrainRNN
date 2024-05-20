@@ -11,7 +11,7 @@ def exp_std(w, max_w=np.max(adj_mat), std_lim = 3, a=2):
     return std_lim*np.exp((w/max_w-1)*a)
 
 class BrainRNN(nn.Module):
-    def __init__(self, input_size, output_size, adj_mat, layers, activation=torch.sigmoid, batch_size=8, weights_from_connectome='uniform', std_fct=exp_std, n_input_nodes=0.2):
+    def __init__(self, input_size, output_size, adj_mat, layers, activation=torch.sigmoid, batch_size=8, weights_from_connectome='uniform', additive=True, std_fct=exp_std, n_input_nodes=0.2):
         '''
         Arguments
         ---
@@ -56,10 +56,10 @@ class BrainRNN(nn.Module):
             self.input_layer = nn.Linear(input_size, len(self.layers[0]))
         else:
             # input layer
-            if isinstance(n_input_nodes, float):
+            if n_input_nodes<=1:
                 self.n_input_nodes=min(int(n_input_nodes*len(adj_mat)), len(adj_mat))
                 self.input_layer = nn.Linear(input_size, self.n_input_nodes)
-            elif isinstance(n_input_nodes, int):
+            else:
                 self.n_input_nodes=min(n_input_nodes, len(adj_mat))
                 self.input_layer = nn.Linear(input_size, self.n_input_nodes)
             self.input_idx = np.random.choice(len(adj_mat), size=self.n_input_nodes, replace=False)
