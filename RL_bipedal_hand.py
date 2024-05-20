@@ -20,7 +20,7 @@ device = torch.device("cpu") #torch.device("cuda" if torch.cuda.is_available() e
 
 MAX_STEPS = 300
 MIN_SEQUENCE_LEN = 20
-N_EPISODE = 400
+N_EPISODE = 20
 
 STD_POLICY = 1.0*2
 
@@ -62,7 +62,7 @@ x_vel_idx = 2
 mean_speed = np.mean(ref_states[:,x_vel_idx])
 
 save_dir = 'save'
-model_path = os.path.join(save_dir, "model"+args.f+".pt")
+model_path = os.path.join(save_dir, "model"+args.filename_suffixe+".pt")
 
 
 #env = GymEnv("BipedalWalker-v3", device=device, render_mode="rgb_array")
@@ -539,7 +539,7 @@ def play(policy_net):
     #env.play()
     env.close()
 
-def train(env, runner, policy_net, value_net, agent, max_episode=args.N):
+def train(env, runner, policy_net, value_net, agent, max_episode=args.N_episode):
     mean_total_reward = 0
     mean_length = 0
     save_dir = 'train'
@@ -584,7 +584,7 @@ def train(env, runner, policy_net, value_net, agent, max_episode=args.N):
                 "it": i,
                 "PolicyNet": policy_net.state_dict(),
                 "ValueNet": value_net.state_dict()
-            }, os.path.join(save_dir, "model"+args.f+".pt"))
+            }, os.path.join(save_dir, "model"+args.filename_suffixe+".pt"))
             print("Done.")
             print()
             #play(policy_net)
@@ -631,8 +631,8 @@ if __name__ == '__main__':
         }, os.path.join('save', "model.pt"))
         env.close()
 
-        np.save('train/rewards'+args.f+'.npy', rewards)
-        np.save('train/steps'+args.f+'.npy', steps)
+        np.save('train/rewards'+args.filename_suffixe+'.npy', rewards)
+        np.save('train/steps'+args.filename_suffixe+'.npy', steps)
 
     else:
         if os.path.exists(model_path):

@@ -11,7 +11,33 @@ def exp_std(w, max_w=np.max(adj_mat), std_lim = 3, a=2):
     return std_lim*np.exp((w/max_w-1)*a)
 
 class BrainRNN(nn.Module):
-    def __init__(self, input_size, output_size, adj_mat, layers, activation=torch.sigmoid, batch_size=8, weights_from_connectome='uniform', std_fct=exp_std):
+    def __init__(self, input_size, output_size, adj_mat, layers, activation=torch.sigmoid, batch_size=8, weights_from_connectome='uniform', std_fct=exp_std, n_input_nodes=0.2):
+        '''
+        Arguments
+        ---
+        input_size: int
+            number of inputs to the network (nb of sensory feedback)
+        output_size: int
+            number of outputs of the nuetwork (nb of actions)
+        adj_mat: array of shape (n,n)
+            adjacency matrix of the graph, with n neurons/nodes
+        layers: list
+            index of the nodes contained in each layer of the network
+        activation: func
+            activation function between all but the output layer
+        batch_size: int
+            batch size for computations, depreciated
+        weigths_from_connectome: str or False
+            if False, default weight initialization of torch.nn.Linear
+            if str, see `init_connectome_weights` method
+        std_fct: func
+            function for `init_connectome_weights` method
+        n_input_nodes: int, float or None
+            if int, number of nodes receiving the input (assigned at random)
+            if float, percentage of nodes receiving the input (assigned at random)
+            if None, only the first layer receives the input
+        '''
+
         super(BrainRNN, self).__init__()
         self.input_size = input_size
         self.output_size = output_size
@@ -22,8 +48,46 @@ class BrainRNN(nn.Module):
         self.batch_size = batch_size
         self.reset_hidden_states()
 
+        self.n_input_nodes=n_input_nodes
+
         # Create the input layer
-        self.input_layer = nn.Linear(input_size, len(self.layers[0]))
+        if n_input_nodes is None:
+            self.n_input_nodes = None
+            self.input_layer = nn.Linear(input_size, len(self.layers[0]))
+        else:
+            # input layer
+            if isinstance(n_input_nodes, float):
+                self.n_input_nodes=min(int(n_input_nodes*len(adj_mat)), len(adj_mat))
+                self.input_layer = nn.Linear(input_size, self.n_input_nodes)
+            elif isinstance(n_input_nodes, int):
+                self.n_input_nodes=min(n_input_nodes, len(adj_mat))
+                self.input_layer = nn.Linear(input_size, self.n_input_nodes)
+            self.input_idx = np.random.choice(len(adj_mat), size=self.n_input_nodes, replace=False)
+            # create masks for forward use
+            self.masks_input = [] # masks[i] = coordinates of input going to layer i
+            self.masks_add_vec =  [] # masks[i] = coordinates of add_vec receiving the input
+            self.receives_input = [] # wether layer i receives input or not
+            for i, layer in enumerate(self.layers):
+                mask = []
+                for j, node in enumerate(layer): # idx in input for layer i
+                    k = np.where(self.input_idx == node)[0]
+                    if k.size > 0:
+                        mask.append(k)
+                if len(mask) > 0:
+                    mask = np.hstack(mask)
+                self.masks_input.append(mask)
+
+                mask = []
+                for j,idx in enumerate(self.input_idx): # coordinates in add_vec receiving input
+                    k = np.where(layer==idx)[0]
+                    if k.size > 0:
+                        mask.append(k)
+                if len(mask) > 0:
+                    mask = np.hstack(mask)
+                    self.receives_input.append(True)
+                else:
+                    self.receives_input.append(False)
+                self.masks_add_vec.append(mask)
 
         # Create forward hidden layers
         self.hidden_layers = nn.ModuleList([])
@@ -105,23 +169,45 @@ class BrainRNN(nn.Module):
         skips = [] # list of current states for skip connections
 
         # Input layer
-        x = self.activation(self.input_layer(x) + self.recurrent_layers[0](self.hidden_states))
-        next_hidden_states[...,self.layers[0]] = x
+        if self.n_input_nodes is None:
+            x = self.activation(self.input_layer(x) + self.recurrent_layers[0](self.hidden_states))
+            next_hidden_states[...,self.layers[0]] = x
+        else:
+            inputs = self.input_layer(x).squeeze()
+            add_vec = torch.zeros((x.shape[0],len(self.layers[0]))) if x.dim() > 1 else torch.zeros(len(self.layers[0]))
+            add_vec[...,self.masks_add_vec[0]] = inputs[...,self.masks_input[0]]
+            x = self.recurrent_layers[0](self.hidden_states) + add_vec
+            next_hidden_states[...,self.layers[0]] = x
+        
+
         skips.append(x)
 
-        # Hidden layers
+        # "Middle" layers
         for i in range(len(self.layers)-1):
-            if i == 0: # no skip connection from layer 0 to 1
-                x = self.hidden_layers[i](x) + self.recurrent_layers[i+1](self.hidden_states)
-            elif i == len(self.layers)-2: # no recurrent connection for last hidden layer
-                x = self.hidden_layers[i](x) + self.skip_layers[i-1](torch.concat(skips[:-1], dim=-1)) 
+            if self.n_input_nodes is None or not self.receives_input[i]:
+                if i == 0: # no skip connection from layer 0 to 1
+                    x = self.hidden_layers[i](x) + self.recurrent_layers[i+1](self.hidden_states)
+                elif i == len(self.layers)-2: # no recurrent connection for last hidden layer
+                    x = self.hidden_layers[i](x) + self.skip_layers[i-1](torch.concat(skips[:-1], dim=-1)) 
+                else:
+                    x = (self.hidden_layers[i](x) 
+                         + self.recurrent_layers[i+1](self.hidden_states)
+                         + self.skip_layers[i-1](torch.concat(skips[:-1], dim=-1)) ## skips a pas la bonne dimension
+                    )
             else:
-                x = (self.hidden_layers[i](x) 
-                     + self.recurrent_layers[i+1](self.hidden_states)
-                     + self.skip_layers[i-1](torch.concat(skips[:-1], dim=-1)) ## skips a pas la bonne dimension
-                )
+                add_vec = torch.zeros((x.shape[0],len(self.layers[i+1]))) if x.dim() > 1 else torch.zeros(len(self.layers[i+1]))
+                add_vec[...,self.masks_add_vec[i+1]] = inputs[...,self.masks_input[i+1]]
+                if i == 0: # no skip connection from layer 0 to 1
+                    x = self.hidden_layers[i](x) + self.recurrent_layers[i+1](self.hidden_states) + add_vec
+                elif i == len(self.layers)-2: # no recurrent connection for last hidden layer
+                    x = self.hidden_layers[i](x) + self.skip_layers[i-1](torch.concat(skips[:-1], dim=-1)) + add_vec
+                else:
+                    x = (self.hidden_layers[i](x) 
+                         + self.recurrent_layers[i+1](self.hidden_states)
+                         + self.skip_layers[i-1](torch.concat(skips[:-1], dim=-1)) ## skips a pas la bonne dimension
+                         + add_vec)
             x = self.activation(x)
-            next_hidden_states[...,self.layers[i+1]] = x
+            next_hidden_states[...,self.layers[i+1]] = x.detach()
             skips.append(x)
 
         # Output layer

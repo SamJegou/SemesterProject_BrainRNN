@@ -41,6 +41,8 @@ V save rewards of training !
     - possible to put many (python my_script.py arg1   -new line-   python my_script.py arg2, etc)
     V ATTENTION nom de fichier enregistrés ! -> -f argument (suffixe to filename)
 
+- test 'random_sequential' strategy for coloring (and not have potential information bottleneck due to largest first strategy) BUT still check that the result is ok (colors, etc)
+
 - Modifier reward pour que ce soit indépendant (?) de la taille de l'épisode -> pour le moment, rester debout sans avancer rapporte pas mal de reward
     -> Plutôt early termination sur mouvement bloqué & durée épisode plus grande pour récompenser ceux qui vont loin
 
