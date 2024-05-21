@@ -10,8 +10,8 @@ with open(DATA_FOLDER+'adj_matrices.json', 'r') as file:
 model = "LegNpT1_L" # "simple", "medium", "standard_leg" (1624 connections) "LegNpT1_L" (37026 connections)
 
 nb_joints = 1
-input_params = 24 # th/thdot
-output_params = 4 # th/thdot
+input_params = 24 # observations
+output_params = 4 # actions
 input_size = input_params*nb_joints
 output_size = output_params*nb_joints
 pred = 'theta' #'sin'

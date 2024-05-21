@@ -20,7 +20,7 @@ device = torch.device("cpu") #torch.device("cuda" if torch.cuda.is_available() e
 
 MAX_STEPS = 300
 MIN_SEQUENCE_LEN = 20
-N_EPISODE = 200
+N_EPISODE = 10
 
 STD_POLICY = 1.0*2
 
@@ -29,7 +29,10 @@ weights_additive = True
 
 n_inputs = None
 
-SAVE_VIDEO = 10 # save video of training all ... episodes
+filename_suffixe = 'test'
+
+SAVE_VIDEO = 2 # save video of training all ... episodes
+SAVE_STATES = 1
 
 DUMB_PATH = 'data/dumb_ref_states.npy'
 REF_STATES_PATH = 'data/BW_ref_states2.npy'
@@ -38,8 +41,8 @@ if DUMB_MVT:
 else:
     ref_states = np.load(REF_STATES_PATH)
 
-w_I=0.8
-w_G=0.2
+w_I=0.7
+w_G=0.3
 w_p=0.7
 w_v=0.3
 
@@ -55,12 +58,13 @@ parser.add_argument('--w_G', type=float, default=w_G)
 parser.add_argument('--w_p', type=float, default=w_p)
 parser.add_argument('--w_v', type=float, default=w_v)
 parser.add_argument('-f', '--filename_suffixe', type=str,
-                    default='',
+                    default=filename_suffixe,
                     help='suffixe to add to the saved files from this run')
 parser.add_argument('--n_inputs', type=float, default=n_inputs, help='Number or fraction of nodes receiving the input. None if 1st layer is input.')
 parser.add_argument('--weights_law', type=str, default=weights_from_connectome, help='uniform/normal/False; method to initialize weights')
 parser.add_argument('--weights_additive', type=str, default=weights_additive, help='non-centered & short (True) or centered and wide (False) law for weights initialization')
 parser.add_argument('--save_video', type=int, default=SAVE_VIDEO, help='save video of training all ... episodes')
+parser.add_argument('--save_states', type=int, default=SAVE_STATES, help='save states of training all ... episodes')
 args = parser.parse_args()
 
 
@@ -140,7 +144,7 @@ class ModifiedRewardWrapper(Wrapper):
         obs, reward_base, terminated, truncated, info = self.env.step(action)
         ref = ref_states[self.step_counter,:]
 
-        task_r = np.exp(-2.5*np.max((0, mean_speed - obs[x_vel_idx]))**2)
+        task_r = np.exp(-1.*np.max((0, mean_speed - obs[x_vel_idx]))**2)
         if reward_base == -100: # robot fell
             task_r -= self.fall_penalization
 
@@ -554,6 +558,7 @@ def train(env, runner, policy_net, value_net, agent, max_episode=args.N_episode)
 
     all_rewards = np.zeros(max_episode)
     all_steps = np.zeros(max_episode)
+    all_states = np.zeros((max_episode//args.save_states, args.Step, input_params))
 
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
@@ -569,6 +574,8 @@ def train(env, runner, policy_net, value_net, agent, max_episode=args.N_episode)
 
         all_rewards[i] = mb_rewards.sum()
         all_steps[i] = len(mb_states)
+        if i%args.save_states==0:
+            all_states[i, :len(mb_states)] = mb_states
 
         #Train the model using the collected data
         policy_net.reset_hidden_states()
@@ -593,13 +600,18 @@ def train(env, runner, policy_net, value_net, agent, max_episode=args.N_episode)
                 "PolicyNet": policy_net.state_dict(),
                 "ValueNet": value_net.state_dict()
             }, os.path.join(save_dir, "model"+args.filename_suffixe+".pt"))
+
+            np.save('train/rewards'+args.filename_suffixe+'.npy', all_rewards)
+            np.save('train/steps'+args.filename_suffixe+'.npy', all_steps)
+            np.save('train/states'+args.filename_suffixe+'.npy', all_states)
+
             print("Done.")
             print()
             #play(policy_net)
             mean_total_reward = 0
             mean_length = 0
         
-    return all_rewards, all_steps
+    return all_rewards, all_steps, all_states
 
 if __name__ == '__main__':
     ### Training/Evaluation
@@ -631,7 +643,7 @@ if __name__ == '__main__':
             else:
                 print('ERROR: No model saved')
 
-        rewards, steps = train(env, runner, policy_net, value_net, agent)
+        rewards, steps, states = train(env, runner, policy_net, value_net, agent)
 
         torch.save({
             "PolicyNet": policy_net.state_dict(),
@@ -641,6 +653,7 @@ if __name__ == '__main__':
 
         np.save('train/rewards'+args.filename_suffixe+'.npy', rewards)
         np.save('train/steps'+args.filename_suffixe+'.npy', steps)
+        np.save('train/states'+args.filename_suffixe+'.npy', states)
 
     else:
         if os.path.exists(model_path):
