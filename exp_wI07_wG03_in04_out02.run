@@ -1,0 +1,9 @@
+#!/bin/bash
+#SBATCH --nodes 1
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 4
+#SBATCH --mem 15G
+#SBATCH --time 8:00:00
+#SBATCH --job-name train_wI07_wG03_in04_out02
+
+python RL_bipedal_hand.py -N 3001 --Step 500 --save_video 1000 --save_states 100 --w_I 0.7 --w_G 0.3 --n_inputs 0.4 --n_outputs 0.2 -f _wI07_wG03_in04_out02

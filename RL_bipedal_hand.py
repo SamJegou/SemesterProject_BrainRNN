@@ -18,8 +18,8 @@ CONTINUE_TRAINING = False
 
 device = torch.device("cpu") #torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-MAX_STEPS = 300
-MIN_SEQUENCE_LEN = 20
+MAX_STEPS = 500
+MIN_SEQUENCE_LEN = 40
 N_EPISODE = 10
 
 STD_POLICY = 1.0*2
@@ -28,11 +28,12 @@ weights_from_connectome = 'normal'
 weights_additive = True
 
 n_inputs = None
+n_outputs = 0.2
 
-filename_suffixe = 'test'
+filename_suffixe = '_wI07_wG03'
 
-SAVE_VIDEO = 2 # save video of training all ... episodes
-SAVE_STATES = 1
+SAVE_VIDEO = 1 # save video of training all ... episodes
+SAVE_STATES = 200
 
 DUMB_PATH = 'data/dumb_ref_states.npy'
 REF_STATES_PATH = 'data/BW_ref_states2.npy'
@@ -61,9 +62,10 @@ parser.add_argument('-f', '--filename_suffixe', type=str,
                     default=filename_suffixe,
                     help='suffixe to add to the saved files from this run')
 parser.add_argument('--n_inputs', type=float, default=n_inputs, help='Number or fraction of nodes receiving the input. None if 1st layer is input.')
+parser.add_argument('--n_outputs', type=float, default=n_outputs, help='Number or fraction of nodes connected to output.')
 parser.add_argument('--weights_law', type=str, default=weights_from_connectome, help='uniform/normal/False; method to initialize weights')
 parser.add_argument('--weights_additive', type=str, default=weights_additive, help='non-centered & short (True) or centered and wide (False) law for weights initialization')
-parser.add_argument('--save_video', type=int, default=SAVE_VIDEO, help='save video of training all ... episodes')
+parser.add_argument('--save_video', type=int, default=SAVE_VIDEO, help='save video of training all ... episodes. -1 for no video save')
 parser.add_argument('--save_states', type=int, default=SAVE_STATES, help='save states of training all ... episodes')
 args = parser.parse_args()
 
@@ -88,7 +90,7 @@ a_dim = env.action_space.shape[0]
 env = RecordVideo(env, 
                    video_folder="videoRL/",
                    name_prefix="test-video",
-                   episode_trigger=lambda x: x % args.save_video == 0
+                   episode_trigger=lambda x: x % args.save_video == 0 if args.save_video >= 0 else False
                    )
 
 class ModifiedRewardWrapper(Wrapper):
@@ -144,7 +146,7 @@ class ModifiedRewardWrapper(Wrapper):
         obs, reward_base, terminated, truncated, info = self.env.step(action)
         ref = ref_states[self.step_counter,:]
 
-        task_r = np.exp(-1.*np.max((0, mean_speed - obs[x_vel_idx]))**2)
+        task_r = np.exp(-4.*np.max((0, mean_speed - obs[x_vel_idx]))**2)
         if reward_base == -100: # robot fell
             task_r -= self.fall_penalization
 
@@ -286,7 +288,8 @@ class PolicyNet(nn.Module):
                              batch_size=batch_size,
                              weights_from_connectome=args.weights_law,
                              additive=args.weights_additive,
-                             n_input_nodes=args.n_inputs
+                             n_input_nodes=args.n_inputs,
+                             n_output_nodes=args.n_outputs
                              )
         self.dist = DiagGaussian(output_size, a_dim, std=std)
     
@@ -334,7 +337,8 @@ class ValueNet(nn.Module):
                              batch_size=batch_size,
                              weights_from_connectome=args.weights_law,
                              additive=args.weights_additive,
-                             n_input_nodes=args.n_inputs
+                             n_input_nodes=args.n_inputs,
+                             n_output_nodes=args.n_outputs
                              )
     
     #Forward pass
@@ -558,7 +562,10 @@ def train(env, runner, policy_net, value_net, agent, max_episode=args.N_episode)
 
     all_rewards = np.zeros(max_episode)
     all_steps = np.zeros(max_episode)
-    all_states = np.zeros((max_episode//args.save_states, args.Step, input_params))
+    if max_episode//args.save_states == 0:
+        all_states = np.zeros((1, args.Step, input_params))
+    else:
+        all_states = np.zeros((max_episode//args.save_states, args.Step, input_params))
 
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
@@ -575,7 +582,7 @@ def train(env, runner, policy_net, value_net, agent, max_episode=args.N_episode)
         all_rewards[i] = mb_rewards.sum()
         all_steps[i] = len(mb_states)
         if i%args.save_states==0:
-            all_states[i, :len(mb_states)] = mb_states
+            all_states[i//args.save_states, :len(mb_states)] = mb_states
 
         #Train the model using the collected data
         policy_net.reset_hidden_states()
@@ -586,7 +593,7 @@ def train(env, runner, policy_net, value_net, agent, max_episode=args.N_episode)
         print("[Episode {:4d}] total reward = {:.6f}, length = {:d}".format(i, mb_rewards.sum(), len(mb_states)))
 
         #Show the current result & save the model
-        if i % 200 == 0:
+        if i % 1000 == 0:
             print("\n[{:5d} / {:5d}]".format(i, max_episode))
             print("----------------------------------")
             print("actor loss = {:.6f}".format(pg_loss))
@@ -620,19 +627,20 @@ if __name__ == '__main__':
     runner = EnvRunner(s_dim, a_dim, max_step=args.Step)
     agent = PPO(policy_net, value_net, min_seq_len=args.min_seq_len)
 
+    
+    if DUMB_MVT:
+        env = DumbWrapper(env)
+    else:
+        env = ModifiedRewardWrapper(env, 
+                               w_I=args.w_I, 
+                               w_G=args.w_G, 
+                               fall_penalization=5,
+                               w_p=args.w_p, 
+                               w_v=args.w_v,
+                               early_term=False,
+                               n_steps_term=40,
+                               critic_vel_term=0)
     if TRAIN:
-        if DUMB_MVT:
-            env = DumbWrapper(env)
-        else:
-            env = ModifiedRewardWrapper(env, 
-                                   w_I=args.w_I, 
-                                   w_G=args.w_G, 
-                                   fall_penalization=5,
-                                   w_p=args.w_p, 
-                                   w_v=args.w_v,
-                                   early_term=False,
-                                   n_steps_term=40,
-                                   critic_vel_term=0)
         if CONTINUE_TRAINING: # load precedent saved models
             if os.path.exists(model_path):
                 print("Loading the model ... ", end="")

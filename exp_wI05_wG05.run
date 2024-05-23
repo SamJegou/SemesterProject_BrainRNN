@@ -3,7 +3,7 @@
 #SBATCH --ntasks 1
 #SBATCH --cpus-per-task 4
 #SBATCH --mem 30G
-#SBATCH --time 5:00:00
+#SBATCH --time 8:00:00
 #SBATCH --job-name train_wI05_wG05
 
-python RL_bipedal_hand.py -N 3000 --Step 400 --save_video 200 --save_states 50 --w_I 0.5 --w_G 0.5 -f _wI05_wG05
+python RL_bipedal_hand.py -N 3001 --Step 500 --save_video 1000 --save_states 100 --w_I 0.5 --w_G 0.5 -f _wI05_wG05

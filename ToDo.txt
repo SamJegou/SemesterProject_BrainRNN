@@ -34,11 +34,14 @@ V Ajuster les poids initiaux de BrainRNN en fonction des weights de adj_mat
 
 V save rewards of training !
 
-- link input feedback to more nodes (random with different nb targeted nodes, and see how well the network performs)
+V link input feedback to more nodes (random with different nb targeted nodes, and see how well the network performs)
+
+- !!!!!!!!! Modifier output layer: pour le moment c'est que dernière layer -> output, mais last layer = 1 neurone => GIGA perte d'information
 
 - run on Scitas:
-    - have a .run file (as Sibo sent)
-    - possible to put many (python my_script.py arg1   -new line-   python my_script.py arg2, etc)
+    - !!!! See memory issue -> remove video save ??
+    V have a .run file (as Sibo sent)
+    V possible to put many (python my_script.py arg1   -new line-   python my_script.py arg2, etc) -> run sequentially => not optimal
     V ATTENTION nom de fichier enregistrés ! -> -f argument (suffixe to filename)
 
 - test 'random_sequential' strategy for coloring (and not have potential information bottleneck due to largest first strategy) BUT still check that the result is ok (colors, etc)
@@ -47,7 +50,6 @@ V save rewards of training !
     -> Plutôt early termination sur mouvement bloqué & durée épisode plus grande pour récompenser ceux qui vont loin
 
 - Modifier output layer pour avoir (potentiellement) tous les neurones qui puissent arriver aux motorneurons (voir avec Sibo)
-
 
 - 0 MotroNeuron with target = LegNpT1_L => empty layer at the end of the graph => Error
 

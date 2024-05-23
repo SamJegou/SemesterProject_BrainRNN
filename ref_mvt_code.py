@@ -7,6 +7,7 @@ from gymnasium.wrappers.record_video import RecordVideo
 
 from RL_bipedal_hand import ModifiedRewardWrapper
 
+SAVE = False
 
 DUMB_MVT = False
 DUMB_PATH = 'data/dumb_ref_states.npy'
@@ -15,7 +16,7 @@ freq = 1.
 model_path = 'models/ref_mvt2.pt'
 REF_STATES_PATH = 'data/BW_ref_states2.npy'
 
-MAX_STEPS = 1600
+MAX_STEPS = 500
 env = gym.make("BipedalWalker-v3",
                render_mode="rgb_array",
                max_episode_steps=MAX_STEPS)
@@ -24,12 +25,18 @@ env = RecordVideo(env,
                    video_folder="videoRL/",
                    name_prefix="reference",
                    episode_trigger=lambda x: x % 5 == 0)
+
+w_I=0.7
+w_G=0.3
+w_p=0.7
+w_v=0.3
+
 env = ModifiedRewardWrapper(env, 
-                            w_I=0.8, 
-                            w_G=0.2, 
+                            w_I=w_I, 
+                            w_G=w_G, 
                             fall_penalization=5,
-                            w_p=0.5, 
-                            w_v=0.5,
+                            w_p=w_p, 
+                            w_v=w_v,
                             early_term=False,
                             n_steps_term=40,
                             critic_vel_term=0
@@ -187,6 +194,7 @@ if __name__ == '__main__':
         else:
             print('ERROR: No model saved')
 
-        #play(policy_net)
-        save_states(policy_net)
+        play(policy_net)
+        if SAVE:
+            save_states(policy_net)
     

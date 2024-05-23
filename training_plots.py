@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+FULL = True
+
+save_states = 100 # save states every ... episode
 filename_suffixe = '_wI07_WG03'
 obs_to_plot = ['hip_joint_1_angle', 'hip_joint_2_angle']
 
@@ -21,9 +24,14 @@ obs_space = {
     'leg_ground_contact_flag':13,
     'lidar_readings':list(range(14,24))
 }
-rewards = np.load('train/rewards'+filename_suffixe+'.npy')
-steps = np.load('train/steps'+filename_suffixe+'.npy')
-states = np.load('train/states'+filename_suffixe+'.npy')
+
+rewards = np.load('save/rewards'+filename_suffixe+'.npy')
+steps = np.load('save/steps'+filename_suffixe+'.npy')
+states = np.load('save/states'+filename_suffixe+'.npy')
+if not FULL:
+    states = states[-100:,:]
+    rewards = rewards[-100:]
+    steps = steps[-100:]
 
 t = range(len(rewards))
 idx_states = [obs_space[obs] for obs in obs_to_plot]
@@ -50,8 +58,14 @@ axs[1].set_xlabel('Step')
 axs[1].set_title('Observation variables (last epoch)')
 axs[1].legend()
 
-#fig.tight_layout()  # otherwise the right y-label is slightly clipped
-plt.title('Training'+filename_suffixe)
 plt.grid()
+
+if FULL:
+    plt.suptitle('Training'+filename_suffixe)
+    plt.savefig(f'data/{filename_suffixe}_states_full')
+else:
+    plt.suptitle('Training'+filename_suffixe+f'(last {len(states)} states)')
+    plt.savefig(f'data/{filename_suffixe}_states_partial')
+#fig.tight_layout()  # otherwise the right y-label is slightly clipped
 plt.show()
 

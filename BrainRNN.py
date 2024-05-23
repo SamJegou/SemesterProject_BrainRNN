@@ -11,7 +11,7 @@ def exp_std(w, max_w=np.max(adj_mat), std_lim = 3, a=2):
     return std_lim*np.exp((w/max_w-1)*a)
 
 class BrainRNN(nn.Module):
-    def __init__(self, input_size, output_size, adj_mat, layers, activation=torch.sigmoid, batch_size=8, weights_from_connectome='uniform', additive=True, std_fct=exp_std, n_input_nodes=0.2):
+    def __init__(self, input_size, output_size, adj_mat, layers, activation=torch.sigmoid, batch_size=8, weights_from_connectome='uniform', additive=True, std_fct=exp_std, n_input_nodes=0.2, n_output_nodes=0.2):
         '''
         Arguments
         ---
@@ -55,13 +55,13 @@ class BrainRNN(nn.Module):
             self.n_input_nodes = None
             self.input_layer = nn.Linear(input_size, len(self.layers[0]))
         else:
-            # input layer
+            # choice of input neurons
             if n_input_nodes<=1:
                 self.n_input_nodes=min(int(n_input_nodes*len(adj_mat)), len(adj_mat))
-                self.input_layer = nn.Linear(input_size, self.n_input_nodes)
             else:
                 self.n_input_nodes=min(n_input_nodes, len(adj_mat))
-                self.input_layer = nn.Linear(input_size, self.n_input_nodes)
+            self.input_layer = nn.Linear(input_size, self.n_input_nodes)
+
             self.input_idx = np.random.choice(len(adj_mat), size=self.n_input_nodes, replace=False)
             # create masks for forward use
             self.masks_input = [] # masks[i] = coordinates of input going to layer i
@@ -122,8 +122,17 @@ class BrainRNN(nn.Module):
             nb_nodes += len(self.layers[i-1])
 
         # Create the output layer
-        self.output_layer = nn.Linear(len(self.layers[-1]), output_size)
-
+        if n_output_nodes is None:
+            self.output_layer = nn.Linear(len(self.layers[-1]), output_size)
+        else:
+            # choice of output neurons
+            if n_output_nodes<=1:
+                self.n_output_nodes=min(int(n_output_nodes*len(adj_mat)), len(adj_mat))
+            else:
+                self.n_output_nodes=min(n_output_nodes, len(adj_mat))
+            self.output_layer = nn.Linear(self.n_output_nodes, output_size)
+            self.output_idx = np.random.choice(len(adj_mat), size=self.n_output_nodes, replace=False)
+        
         if weights_from_connectome:
             self.init_connectome_weights(std_fct=std_fct, law=weights_from_connectome)
     
@@ -211,7 +220,7 @@ class BrainRNN(nn.Module):
             skips.append(x)
 
         # Output layer
-        x = self.output_layer(x) # no activation nor recurrent/skip connection for the last one
+        x = self.output_layer(next_hidden_states[...,self.output_idx])
 
         self.hidden_states = next_hidden_states
 

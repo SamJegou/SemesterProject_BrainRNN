@@ -1,0 +1,18 @@
+exp_wI05_wG05 -> (n_output=0.2, n_input=None) ; nul
+exp_wI07_wG03 -> (n_output=0.2, n_input=None) ; bonne pose mais avance pas, changement de wrapper pour accentuer task
+
+Change: 
+    - modify wrapper (task_r = np.exp(-4.*...) instead of np.exp(-1.*...))
+    - min_seq_len = 40 instead of 20
+
+exp_wI07_wG03_in02_out02:
+    - job 22841233
+
+exp_wI07_wG03_in04_out02:
+    - job 22841234
+
+exp_wI09_wG01_in02_out02:
+    - job 22841236
+
+exp_wI09_wG01_in04_out02:
+    - job 22841237
