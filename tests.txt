@@ -5,14 +5,92 @@ Change:
     - modify wrapper (task_r = np.exp(-4.*...) instead of np.exp(-1.*...))
     - min_seq_len = 40 instead of 20
 
-exp_wI07_wG03_in02_out02:
-    - job 22841233
+exp_wI07_wG03_in02_out02: claqué
+    - job 22841514
 
-exp_wI07_wG03_in04_out02:
-    - job 22841234
+exp_wI07_wG03_in04_out02: bonne pose mais avance pas
+    - job 22841515
 
-exp_wI09_wG01_in02_out02:
-    - job 22841236
+exp_wI09_wG01_in02_out02: bonne pose mais avance pas
+    - job 22841517
 
+exp_wI09_wG01_in04_out02: bonne pose mais avance pas
+    - job 22841518
+
+Change: remove video save & save losses
+
+exp_wI09_wG01_in02_out02: best results from the batch of tests
+    - job 22893616
 exp_wI09_wG01_in04_out02:
-    - job 22841237
+    - job 22893617
+exp_wI09_wG01_in02_out04:
+    - job 22893618
+exp_wI09_wG01_in04_out04:
+    - job 22893620
+
+exp_wI075_wG025_in02_out02: 
+    - job 22893621
+exp_wI075_wG025_in04_out02: 
+    - job 22893622
+exp_wI075_wG025_in02_out04: 
+    - job 22893623
+exp_wI075_wG025_in04_out04: 
+    - job 22893624
+
+exp_wI09_wG01_in02_out02_std1: DO NOT LEARN
+    - job 228902732
+exp_wI09_wG01_in02_out02_std05: LEARN BUT NOT FAST ENOUGH
+    - job 228902742
+
+Change: add change in middle of run
+
+Change: coeffs in rewards
+
+(for all these, agent stuck in "flat" position)
+exp_wI09_wG01_in02_out02: don't learn and no progress in loss
+    - job 22955202
+exp_wI07_wG03_in02_out02: v_loss decreases !! 
+    - job 22955204
+exp_wI09_wG01_in04_out04: progress in rewards but no progression in loss
+    - job 22955203
+exp_wI09_wG01_in02_out02_std05: first very bad, then peak in rewards, and then nothing changes
+    - job 22955205
+
+exp_wI09-06_wG01-04_in02_out02_std2: seems to learn something at the end (I don't have the std2 training)
+    - job 22955207
+exp_wI09_wG01_in02_out02_std2-1: seems to learn something at the end (I don't have the std2 training)
+    - job 22955208
+exp_wI09_wG01_in02_out02_std2-4-2:
+    - job 22955209
+
+
+Change: coeffs in reward (and fix save)
+exp_wI09_wG01_in02_out02: 
+    - 22957944
+exp_wI07_wG03_in02_out02: 
+    - 22957945
+exp_wI09_wG01_in04_out04: 
+    - 22957946
+exp_wI07_wG03_in04_out04:
+    - 22957952
+exp_wI09-06_wG01-04_in02_out02_std2: 
+    - 22957949
+exp_wI09_wG01_in02_out02_std4-2-1:
+    - 22957950
+exp_wI07_wG03_in02_out02_std4-2-1:
+    - 22957951
+
+
+Change: add gamma as arg -> action had too high frequency
+exp_wI09_wG01_in02_out02_std1:
+    - 22970554
+exp_wI09_wG01_in02_out02_std1_gamma097:
+    - 22970559
+exp_wI09_wG01_in02_out02_std1_gamma095:
+    - 22970560
+exp_wI09_wG01_in02_out02_std01:
+    - 22970563
+exp_wI09_wG01_in02_out02_std01_gamma097:
+    - 22970566
+exp_wI09_wG01_in02_out02_std01_gamma095:
+    - 22970570

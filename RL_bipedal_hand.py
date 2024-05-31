@@ -15,22 +15,24 @@ from BrainRNN import BrainRNN
 DUMB_MVT = False
 TRAIN = True
 CONTINUE_TRAINING = False
+SAVE = True # if no training, save states and actions in save directory
 
 device = torch.device("cpu") #torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 MAX_STEPS = 500
 MIN_SEQUENCE_LEN = 40
-N_EPISODE = 10
+N_EPISODE = 5
 
 STD_POLICY = 1.0*2
+GAMMA = 0.99
 
 weights_from_connectome = 'normal'
 weights_additive = True
 
-n_inputs = None
+n_inputs = 0.2
 n_outputs = 0.2
 
-filename_suffixe = '_wI07_wG03'
+filename_suffixe = '_wI09_wG01_in02_out02_std05'
 
 SAVE_VIDEO = 1 # save video of training all ... episodes
 SAVE_STATES = 200
@@ -58,19 +60,24 @@ parser.add_argument('--w_I', type=float, default=w_I)
 parser.add_argument('--w_G', type=float, default=w_G)
 parser.add_argument('--w_p', type=float, default=w_p)
 parser.add_argument('--w_v', type=float, default=w_v)
+parser.add_argument('--std', type=float, default=STD_POLICY, help='Std deviation for Policy network')
 parser.add_argument('-f', '--filename_suffixe', type=str,
                     default=filename_suffixe,
                     help='suffixe to add to the saved files from this run')
+parser.add_argument('--gamma', type=float, default=GAMMA, help='discount factor')
 parser.add_argument('--n_inputs', type=float, default=n_inputs, help='Number or fraction of nodes receiving the input. None if 1st layer is input.')
 parser.add_argument('--n_outputs', type=float, default=n_outputs, help='Number or fraction of nodes connected to output.')
 parser.add_argument('--weights_law', type=str, default=weights_from_connectome, help='uniform/normal/False; method to initialize weights')
 parser.add_argument('--weights_additive', type=str, default=weights_additive, help='non-centered & short (True) or centered and wide (False) law for weights initialization')
 parser.add_argument('--save_video', type=int, default=SAVE_VIDEO, help='save video of training all ... episodes. -1 for no video save')
 parser.add_argument('--save_states', type=int, default=SAVE_STATES, help='save states of training all ... episodes')
+parser.add_argument('--continue_training', action=argparse.BooleanOptionalAction, default=CONTINUE_TRAINING, help='True to continue training from saved model')
 args = parser.parse_args()
 
 
-
+CONTINUE_TRAINING = args.continue_training
+STD_POLICY = args.std
+GAMMA = args.gamma
 joints_angle_idx = [4,6,9,11]
 joints_vel_idx = [5,7,10,12]
 x_vel_idx = 2
@@ -87,11 +94,12 @@ env = gym.make("BipedalWalker-v3",
 s_dim = env.observation_space.shape[0]
 a_dim = env.action_space.shape[0]
 
-env = RecordVideo(env, 
-                   video_folder="videoRL/",
-                   name_prefix="test-video",
-                   episode_trigger=lambda x: x % args.save_video == 0 if args.save_video >= 0 else False
-                   )
+if args.save_video >= 0: # if we want to record videos
+    env = RecordVideo(env, 
+                       video_folder="videoRL/",
+                       name_prefix=f"{args.filename_suffixe}-video",
+                       episode_trigger=lambda x: x % args.save_video == 0 if args.save_video >= 0 else False
+                       )
 
 class ModifiedRewardWrapper(Wrapper):
     def __init__(self, env, w_I=0.7, w_G=0.3, w_p=0.65, w_v=0.1, w_e=0.15, w_c=0.1, fall_penalization=20, early_term=False, n_steps_term=40, critic_vel_term=0.1):
@@ -135,7 +143,10 @@ class ModifiedRewardWrapper(Wrapper):
         self.step_counter = 0
         self.mean_vel_list = []
         self.mean_vel = 1
-    
+        
+        #self.debug_pose = 0
+        #self.debug_vel = 0
+
     def reset(self):
         self.step_counter = 0
         self.mean_vel_list = []
@@ -150,11 +161,11 @@ class ModifiedRewardWrapper(Wrapper):
         if reward_base == -100: # robot fell
             task_r -= self.fall_penalization
 
-        pose_r = np.exp(-2*(
+        pose_r = np.exp(-1*( #-2 initially
             np.sum((np.cos(ref[joints_angle_idx])-np.cos(obs[joints_angle_idx]))**2)
             + np.sum((np.sin(ref[joints_angle_idx])-np.sin(obs[joints_angle_idx]))**2))
         )
-        vel_r = np.exp(-0.1*np.sum((ref[joints_vel_idx]-obs[joints_vel_idx])**2))
+        vel_r = np.exp(-1.5*np.sum((ref[joints_vel_idx]-obs[joints_vel_idx])**2)) # -0.1 initially
         end_effector_r = 0
         center_mass_r = 0
         imitation_r = (self.w_p*pose_r
@@ -163,6 +174,11 @@ class ModifiedRewardWrapper(Wrapper):
                        + self.w_c*center_mass_r)
 
         reward = self.w_I*imitation_r + self.w_G*task_r
+
+        #self.debug_pose += pose_r
+        #self.debug_vel += vel_r
+        #if self.step_counter >= 300:
+        #    pass
 
         self.step_counter += 1
 
@@ -555,17 +571,31 @@ def play(policy_net):
     #env.play()
     env.close()
 
-def train(env, runner, policy_net, value_net, agent, max_episode=args.N_episode):
+def train(env, runner, policy_net, value_net, agent, max_episode=args.N_episode, pcdt_rewards=None, pcdt_steps=None, pcdt_states=None, pcdt_actions=None, pcdt_pg_loss=None, pcdt_v_loss=None):
     mean_total_reward = 0
     mean_length = 0
     save_dir = 'train'
 
     all_rewards = np.zeros(max_episode)
     all_steps = np.zeros(max_episode)
+    pg_losses = np.zeros(max_episode)
+    v_losses = np.zeros(max_episode)
     if max_episode//args.save_states == 0:
         all_states = np.zeros((1, args.Step, input_params))
+        all_actions = np.zeros((1, args.Step, output_params))
     else:
-        all_states = np.zeros((max_episode//args.save_states, args.Step, input_params))
+        all_states = np.zeros((max_episode//args.save_states+1, args.Step, input_params))
+        all_actions = np.zeros((max_episode//args.save_states+1, args.Step, output_params))
+    
+    pcdt_len = 0
+    if pcdt_rewards is not None:
+        all_rewards = np.concatenate((pcdt_rewards, all_rewards))
+        all_steps = np.concatenate((pcdt_steps, all_steps))
+        all_states = np.concatenate((pcdt_states, all_states))
+        all_actions = np.concatenate((pcdt_actions, all_actions))
+        pg_losses = np.concatenate((pcdt_pg_loss, pg_losses))
+        v_losses = np.concatenate((pcdt_v_loss, v_losses))
+        pcdt_len = len(pcdt_rewards)
 
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
@@ -579,10 +609,11 @@ def train(env, runner, policy_net, value_net, agent, max_episode=args.N_episode)
             mb_advs = mb_returns - mb_values
             mb_advs = (mb_advs - mb_advs.mean()) / (mb_advs.std() + 1e-6)
 
-        all_rewards[i] = mb_rewards.sum()
-        all_steps[i] = len(mb_states)
+        all_rewards[pcdt_len+i] = mb_rewards.sum()
+        all_steps[pcdt_len+i] = len(mb_states)
         if i%args.save_states==0:
-            all_states[i//args.save_states, :len(mb_states)] = mb_states
+            all_states[(pcdt_len+i)//args.save_states, :len(mb_states), :] = mb_states
+            all_actions[(pcdt_len+i)//args.save_states, :len(mb_actions), :] = mb_actions
 
         #Train the model using the collected data
         policy_net.reset_hidden_states()
@@ -590,35 +621,81 @@ def train(env, runner, policy_net, value_net, agent, max_episode=args.N_episode)
         pg_loss, v_loss, ent = agent.train(mb_states, mb_actions, mb_values, mb_advs, mb_returns, mb_old_a_logps)
         mean_total_reward += mb_rewards.sum()
         mean_length += len(mb_states)
-        print("[Episode {:4d}] total reward = {:.6f}, length = {:d}".format(i, mb_rewards.sum(), len(mb_states)))
+        print("[Episode {:4d}] total reward = {:.6f}, length = {:d}".format(pcdt_len+i, mb_rewards.sum(), len(mb_states)))
+        pg_losses[pcdt_len+i] = pg_loss
+        v_losses[pcdt_len+i] = v_loss
 
         #Show the current result & save the model
-        if i % 1000 == 0:
-            print("\n[{:5d} / {:5d}]".format(i, max_episode))
+        if i % 10000 == 0:
+            print("\n[{:5d} / {:5d}]".format(pcdt_len+i, max_episode))
             print("----------------------------------")
             print("actor loss = {:.6f}".format(pg_loss))
             print("critic loss = {:.6f}".format(v_loss))
             print("entropy = {:.6f}".format(ent))
-            print("mean return = {:.6f}".format(mean_total_reward / 200))
-            print("mean length = {:.2f}".format(mean_length / 200))
+            print("mean return = {:.6f}".format(mean_total_reward / 10000))
+            print("mean length = {:.2f}".format(mean_length / 10000))
             print("\nSaving the model ... ", end="")
             torch.save({
-                "it": i,
+                "it": pcdt_len+i,
                 "PolicyNet": policy_net.state_dict(),
                 "ValueNet": value_net.state_dict()
             }, os.path.join(save_dir, "model"+args.filename_suffixe+".pt"))
-
-            np.save('train/rewards'+args.filename_suffixe+'.npy', all_rewards)
-            np.save('train/steps'+args.filename_suffixe+'.npy', all_steps)
-            np.save('train/states'+args.filename_suffixe+'.npy', all_states)
 
             print("Done.")
             print()
             #play(policy_net)
             mean_total_reward = 0
             mean_length = 0
+
+        if i %1000 == 0:
+            np.save('train/rewards'+args.filename_suffixe+'.npy', all_rewards)
+            np.save('train/steps'+args.filename_suffixe+'.npy', all_steps)
+            np.save('train/states'+args.filename_suffixe+'.npy', all_states)
+            np.save('train/actions'+args.filename_suffixe+'.npy', all_actions)
+            np.save('train/pg_loss'+args.filename_suffixe+'.npy', pg_losses)
+            np.save('train/v_loss'+args.filename_suffixe+'.npy', v_losses)
+            
         
-    return all_rewards, all_steps, all_states
+    return all_rewards, all_steps, all_states, all_actions, pg_losses, v_losses
+
+def save_states(policy_net, save_states_path='save/states'+args.filename_suffixe+'_last.npy', save_actions_path='save/actions'+args.filename_suffixe+'_last.npy'):
+
+    with torch.no_grad():
+        state, info = env.reset()
+        total_reward = 0
+        length = 0
+
+        res_states = state
+        res_actions = None
+
+        while True:
+            #state_tensor = torch.tensor(np.expand_dims(state, axis=0), dtype=torch.float32, device='cpu')
+            state_tensor = torch.tensor(state, dtype=torch.float32, device='cpu')
+            #state_tensor = torch.tensor(state.expand(1), dtype=torch.float32, device='cpu')
+            action = policy_net.choose_action(state_tensor, deterministic=False).cpu().numpy()
+            if action.ndim > 1:
+                state, reward, done, truncated, info = env.step(action[0])
+            else:
+                state, reward, done, truncated, info = env.step(action)
+            total_reward += reward
+            length += 1
+
+            if res_actions is None:
+                res_actions = action
+            else:
+                res_actions = np.vstack((res_actions, action))
+
+            res_states = np.vstack((res_states, state))
+            if done or truncated:
+                print("[Evaluation] Total reward = {:.6f}, length = {:d}".format(total_reward, length), flush=True)
+                with open(save_states_path, 'wb') as file:
+                    np.save(file, res_states)
+                with open(save_actions_path, 'wb') as file:
+                    np.save(file, res_actions)
+                print('Reference states saved')
+                break
+    #env.play()
+    env.close()
 
 if __name__ == '__main__':
     ### Training/Evaluation
@@ -645,28 +722,47 @@ if __name__ == '__main__':
             if os.path.exists(model_path):
                 print("Loading the model ... ", end="")
                 checkpoint = torch.load(model_path)
-                policy_net.load_state_dict(checkpoint["PolicyNet"])
                 value_net.load_state_dict(checkpoint["ValueNet"])
+                try:
+                    policy_net.load_state_dict(checkpoint["PolicyNet"])
+                except RuntimeError:
+                    policy_net.reset_hidden_states(hidden_size=checkpoint['PolicyNet']['main.input_layer.weight'].shape[-1])
+                    policy_net.load_state_dict(checkpoint["PolicyNet"])
                 print("Done.")
+                pcdt_rewards = np.load('train/rewards'+args.filename_suffixe+'.npy')
+                pcdt_steps = np.load('train/steps'+args.filename_suffixe+'.npy')
+                pcdt_states = np.load('train/states'+args.filename_suffixe+'.npy')
+                pcdt_actions = np.load('train/actions'+args.filename_suffixe+'.npy')
+                pcdt_pg_loss = np.load('train/pg_loss'+args.filename_suffixe+'.npy')
+                pcdt_v_loss = np.load('train/v_loss'+args.filename_suffixe+'.npy')
+                rewards, steps, states, actions, pg_loss, v_loss = train(env, runner, policy_net, value_net, agent,
+                                                pcdt_rewards=pcdt_rewards, pcdt_steps=pcdt_steps, pcdt_states=pcdt_states, pcdt_actions=pcdt_actions, pcdt_pg_loss=pcdt_pg_loss, pcdt_v_loss=pcdt_v_loss)
             else:
                 print('ERROR: No model saved')
-
-        rewards, steps, states = train(env, runner, policy_net, value_net, agent)
+        else:
+            rewards, steps, states, actions, pg_loss, v_loss = train(env, runner, policy_net, value_net, agent)
 
         torch.save({
             "PolicyNet": policy_net.state_dict(),
             "ValueNet": value_net.state_dict()
-        }, os.path.join('save', "model.pt"))
+        }, os.path.join('save', "model"+args.filename_suffixe+".pt"))
         env.close()
 
         np.save('train/rewards'+args.filename_suffixe+'.npy', rewards)
         np.save('train/steps'+args.filename_suffixe+'.npy', steps)
         np.save('train/states'+args.filename_suffixe+'.npy', states)
+        np.save('train/actions'+args.filename_suffixe+'.npy', actions)
+        np.save('train/pg_loss'+args.filename_suffixe+'.npy', pg_loss)
+        np.save('train/v_loss'+args.filename_suffixe+'.npy', v_loss)
 
     else:
         if os.path.exists(model_path):
             print("Loading the model ... ", end="")
             checkpoint = torch.load(model_path)
+            try:
+                policy_net.load_state_dict(checkpoint["PolicyNet"])
+            except RuntimeError:
+                policy_net.reset_hidden_states(hidden_size=checkpoint['PolicyNet']['main.input_layer.weight'].shape[-1])
             policy_net.load_state_dict(checkpoint["PolicyNet"])
             print("Done.")
         else:
@@ -675,4 +771,8 @@ if __name__ == '__main__':
         #policy_net.main.batch_size = 0
         #hidden_states = policy_net.main.hidden_states[5,:]
         policy_net.reset_hidden_states(hidden_size=0)
-        play(policy_net)
+        
+        if SAVE:
+            save_states(policy_net)
+        else:
+            play(policy_net)

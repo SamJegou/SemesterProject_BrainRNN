@@ -36,13 +36,21 @@ V save rewards of training !
 
 V link input feedback to more nodes (random with different nb targeted nodes, and see how well the network performs)
 
-- !!!!!!!!! Modifier output layer: pour le moment c'est que dernière layer -> output, mais last layer = 1 neurone => GIGA perte d'information
+V !!!!!!!!! Modifier output layer: pour le moment c'est que dernière layer -> output, mais last layer = 1 neurone => GIGA perte d'information
 
-- run on Scitas:
-    - !!!! See memory issue -> remove video save ??
+V run on Scitas:
+    V !!!! See memory issue -> remove video save ??
     V have a .run file (as Sibo sent)
     V possible to put many (python my_script.py arg1   -new line-   python my_script.py arg2, etc) -> run sequentially => not optimal
     V ATTENTION nom de fichier enregistrés ! -> -f argument (suffixe to filename)
+
+V !!!!!!!!!!! REMOVE VIDEO SAVE in next runs -> TAKES AGES !!! -> Done + remove intermediate model save 
+
+V Add loss save
+
+V Decrease sigma after ~1000 steps to train better value network
+
+- End action plots test (4 plots instead of 2 + why torque at 0)
 
 - test 'random_sequential' strategy for coloring (and not have potential information bottleneck due to largest first strategy) BUT still check that the result is ok (colors, etc)
 

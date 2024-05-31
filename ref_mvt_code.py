@@ -7,7 +7,7 @@ from gymnasium.wrappers.record_video import RecordVideo
 
 from RL_bipedal_hand import ModifiedRewardWrapper
 
-SAVE = False
+SAVE = True
 
 DUMB_MVT = False
 DUMB_PATH = 'data/dumb_ref_states.npy'
@@ -15,6 +15,7 @@ freq = 1.
 
 model_path = 'models/ref_mvt2.pt'
 REF_STATES_PATH = 'data/BW_ref_states2.npy'
+REF_ACTIONS_PATH = 'data/BW_ref_actions2.npy'
 
 MAX_STEPS = 500
 env = gym.make("BipedalWalker-v3",
@@ -70,14 +71,15 @@ def play(policy_net):
     #env.play()
     env.close()
 
-def save_states(policy_net, save_path=REF_STATES_PATH):
+def save_states(policy_net, save_states_path=REF_STATES_PATH, save_actions_path=REF_ACTIONS_PATH):
 
     with torch.no_grad():
         state, info = env.reset()
         total_reward = 0
         length = 0
 
-        res = state
+        res_states = state
+        res_actions = None
 
         while True:
             #state_tensor = torch.tensor(np.expand_dims(state, axis=0), dtype=torch.float32, device='cpu')
@@ -91,11 +93,18 @@ def save_states(policy_net, save_path=REF_STATES_PATH):
             total_reward += reward
             length += 1
 
-            res = np.vstack((res, state))
+            if res_actions is None:
+                res_actions = action
+            else:
+                res_actions = np.vstack((res_actions, action))
+
+            res_states = np.vstack((res_states, state))
             if done or truncated:
                 print("[Evaluation] Total reward = {:.6f}, length = {:d}".format(total_reward, length), flush=True)
-                with open(save_path, 'wb') as file:
-                    np.save(file, res)
+                with open(save_states_path, 'wb') as file:
+                    np.save(file, res_states)
+                with open(save_actions_path, 'wb') as file:
+                    np.save(file, res_actions)
                 print('Reference states saved')
                 break
     #env.play()

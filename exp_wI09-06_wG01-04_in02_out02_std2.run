@@ -1,0 +1,10 @@
+#!/bin/bash
+#SBATCH --nodes 1
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 4
+#SBATCH --mem 15G
+#SBATCH --time 8:00:00
+#SBATCH --job-name train_wI09-06_wG01-04_in02_out02_std2
+
+python RL_bipedal_hand.py -N 1501 --Step 500 --save_video -1 --save_states 100 --w_I 0.9 --w_G 0.1 --std 2 --n_inputs 0.2 --n_outputs 0.2 --no-continue_training -f _wI09-06_wG01-04_in02_out02_std2
+python RL_bipedal_hand.py -N 1501 --Step 500 --save_video -1 --save_states 100 --w_I 0.6 --w_G 0.4 --std 2 --n_inputs 0.2 --n_outputs 0.2 --continue_training -f _wI09-06_wG01-04_in02_out02_std2
