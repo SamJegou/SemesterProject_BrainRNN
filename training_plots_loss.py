@@ -7,7 +7,7 @@ END = 2000
 save_states = 100
 
 save_states = 100 # save states every ... episode
-filename_suffixe = '_wI07_WG03_in02_out02'
+filename_suffixe = '_wI09_wG01_in02_out02_std1_act'
 obs_to_plot = ['hip_joint_1_angle', 'hip_joint_2_angle']
 joints_angle_idx = [4,6,9,11]
 joints_vel_idx = [5,7,10,12]

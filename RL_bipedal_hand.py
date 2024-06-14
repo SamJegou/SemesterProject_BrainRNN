@@ -13,9 +13,11 @@ from BrainRNN import BrainRNN
 
 ### Parameters ###
 DUMB_MVT = False
-TRAIN = True
+TRAIN = False
 CONTINUE_TRAINING = False
-SAVE = True # if no training, save states and actions in save directory
+SAVE = False # if no training, save states and actions in save directory
+
+TRAIN_ON_ACTION = False
 
 device = torch.device("cpu") #torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -23,8 +25,9 @@ MAX_STEPS = 500
 MIN_SEQUENCE_LEN = 40
 N_EPISODE = 5
 
-STD_POLICY = 1.0*2
+STD_POLICY = 1#1.0*2
 GAMMA = 0.99
+CLIP_ACTION = True
 
 weights_from_connectome = 'normal'
 weights_additive = True
@@ -32,17 +35,21 @@ weights_additive = True
 n_inputs = 0.2
 n_outputs = 0.2
 
-filename_suffixe = '_wI09_wG01_in02_out02_std05'
+filename_suffixe = '_wI09_wG01_in02_out02_std01_act'
 
-SAVE_VIDEO = 1 # save video of training all ... episodes
+SAVE_VIDEO = 5 # save video of training all ... episodes
 SAVE_STATES = 200
 
 DUMB_PATH = 'data/dumb_ref_states.npy'
 REF_STATES_PATH = 'data/BW_ref_states2.npy'
+REF_ACTIONS_PATH = 'data/BW_ref_actions2.npy'
 if DUMB_MVT:
     ref_states = np.load(DUMB_PATH)
 else:
     ref_states = np.load(REF_STATES_PATH)
+
+if TRAIN_ON_ACTION:
+    ref_actions = np.load(REF_ACTIONS_PATH)
 
 w_I=0.7
 w_G=0.3
@@ -143,9 +150,6 @@ class ModifiedRewardWrapper(Wrapper):
         self.step_counter = 0
         self.mean_vel_list = []
         self.mean_vel = 1
-        
-        #self.debug_pose = 0
-        #self.debug_vel = 0
 
     def reset(self):
         self.step_counter = 0
@@ -157,6 +161,16 @@ class ModifiedRewardWrapper(Wrapper):
         obs, reward_base, terminated, truncated, info = self.env.step(action)
         ref = ref_states[self.step_counter,:]
 
+        if TRAIN_ON_ACTION:
+            reward = -((ref_actions[self.step_counter,:]-action)**2).sum()
+            self.step_counter += 1
+            if reward_base == -100:
+                reward = -100000
+            if self.step_counter == len(ref_states)-1:
+                truncated = True
+                terminated = True
+            return obs, reward, terminated, truncated, info
+        
         task_r = np.exp(-4.*np.max((0, mean_speed - obs[x_vel_idx]))**2)
         if reward_base == -100: # robot fell
             task_r -= self.fall_penalization
@@ -305,7 +319,8 @@ class PolicyNet(nn.Module):
                              weights_from_connectome=args.weights_law,
                              additive=args.weights_additive,
                              n_input_nodes=args.n_inputs,
-                             n_output_nodes=args.n_outputs
+                             n_output_nodes=args.n_outputs,
+                             clip_output=CLIP_ACTION
                              )
         self.dist = DiagGaussian(output_size, a_dim, std=std)
     
@@ -354,7 +369,8 @@ class ValueNet(nn.Module):
                              weights_from_connectome=args.weights_law,
                              additive=args.weights_additive,
                              n_input_nodes=args.n_inputs,
-                             n_output_nodes=args.n_outputs
+                             n_output_nodes=args.n_outputs,
+                             clip_output=False
                              )
     
     #Forward pass

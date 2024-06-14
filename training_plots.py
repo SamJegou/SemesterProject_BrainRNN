@@ -4,7 +4,7 @@ import numpy as np
 FULL = True
 
 save_states = 100 # save states every ... episode
-filename_suffixe = '_wI09_wG01_in02_out02_std05'
+filename_suffixe = '_wI09_wG01_in02_out02_std01_act'
 obs_to_plot = ['hip_joint_1_angle', 'hip_joint_2_angle'] + ['knee_joint_1_angle', 'knee_joint_2_angle']
 
 obs_space = {

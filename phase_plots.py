@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 save_states = 100 # save states every ... episode
-filename_suffixe = '_wI09_wG01_in02_out02_std05'
+filename_suffixe = '_wI09_wG01_in02_out02_std01_act'
 limb = 'hip' # hip or knee
 
 

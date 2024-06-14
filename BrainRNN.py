@@ -11,7 +11,7 @@ def exp_std(w, max_w=np.max(adj_mat), std_lim = 3, a=2):
     return std_lim*np.exp((w/max_w-1)*a)
 
 class BrainRNN(nn.Module):
-    def __init__(self, input_size, output_size, adj_mat, layers, activation=torch.sigmoid, batch_size=8, weights_from_connectome='uniform', additive=True, std_fct=exp_std, n_input_nodes=0.2, n_output_nodes=0.2):
+    def __init__(self, input_size, output_size, adj_mat, layers, activation=torch.nn.Sigmoid(), batch_size=8, weights_from_connectome='uniform', additive=True, std_fct=exp_std, n_input_nodes=0.2, n_output_nodes=0.2, clip_output=False):
         '''
         Arguments
         ---
@@ -46,6 +46,7 @@ class BrainRNN(nn.Module):
         self.layers = layers
         self.activation = activation
         self.batch_size = batch_size
+        self.clip_output = clip_output
         self.reset_hidden_states()
 
         self.n_input_nodes=n_input_nodes
@@ -221,6 +222,8 @@ class BrainRNN(nn.Module):
 
         # Output layer
         x = self.output_layer(next_hidden_states[...,self.output_idx])
+        if self.clip_output:
+            x = 2*self.activation(x)-1 # test internal clipping
 
         self.hidden_states = next_hidden_states
 

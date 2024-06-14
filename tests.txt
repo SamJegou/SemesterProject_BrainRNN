@@ -1,3 +1,5 @@
+List of the tests ran
+
 exp_wI05_wG05 -> (n_output=0.2, n_input=None) ; nul
 exp_wI07_wG03 -> (n_output=0.2, n_input=None) ; bonne pose mais avance pas, changement de wrapper pour accentuer task
 
@@ -82,15 +84,51 @@ exp_wI07_wG03_in02_out02_std4-2-1:
 
 
 Change: add gamma as arg -> action had too high frequency
-exp_wI09_wG01_in02_out02_std1:
+exp_wI09_wG01_in02_out02_std1: action still very high freq
     - 22970554
-exp_wI09_wG01_in02_out02_std1_gamma097:
+exp_wI09_wG01_in02_out02_std1_gamma097: no mvt on hip level
     - 22970559
-exp_wI09_wG01_in02_out02_std1_gamma095:
+exp_wI09_wG01_in02_out02_std1_gamma095: frequency still too high ...
     - 22970560
-exp_wI09_wG01_in02_out02_std01:
+exp_wI09_wG01_in02_out02_std01: completely stuck in a position, almost no torque applied
     - 22970563
-exp_wI09_wG01_in02_out02_std01_gamma097:
+exp_wI09_wG01_in02_out02_std01_gamma097: idem
     - 22970566
-exp_wI09_wG01_in02_out02_std01_gamma095:
+exp_wI09_wG01_in02_out02_std01_gamma095:idem
     - 22970570
+
+Change: BrainRNN -> internal clipping of the output (out = 2*sigmoid-1)
+exp_wI09_wG01_in02_out02_std1_act: stuck in position
+    - 22991017
+exp_wI09_wG01_in02_out02_std1_gamma097_act:seems to be the same
+    - 22991019
+exp_wI09_wG01_in02_out02_std1_gamma095_act: debut de qqch, mais tombe vite -> peut etre plus penaliser la chute avec ce gamma
+    - 22991020
+exp_wI09_wG01_in02_out02_std01_act: mean = 0 and noise around...
+    - 22991018
+exp_wI09_wG01_in02_out02_std01_gamma097_act: 
+    - 22991021
+exp_wI09_wG01_in02_out02_std01_gamma095_act:
+    - 22991022
+
+Change: clipping only for agent net
+exp_wI09_wG01_in02_out02_std1_act:
+    - 23000832
+exp_wI09_wG01_in02_out02_std1_gamma097_act:
+    - 23000833
+exp_wI09_wG01_in02_out02_std1_gamma095_act:
+    - 23000834
+
+Change: train directly on actions (reward = -(action-ref_action)**2)
+exp_wI09_wG01_in02_out02_std01_act:
+    - 23072885
+exp_wI09_wG01_in02_out02_std1_act:
+    - 23072888
+exp_wI09_wG01_in02_out02_std1_gamma097_act:
+    - 23072892
+exp_wI09_wG01_in02_out02_std01_gamma097_act:
+    - 23072894
+
+Change: train on 10000 episodes
+exp_wI09_wG01_in02_out02_std01_act:
+    - 23090063

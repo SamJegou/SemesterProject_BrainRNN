@@ -9,7 +9,7 @@ PLOT_ACTIONS = True
 CLIP_ACTION = True
 
 save_states = 100 # save states every ... episode
-filename_suffixe = '_wI09_wG01_in02_out02'
+filename_suffixe = '_wI09_wG01_in02_out02_std01_gamma097_act'
 
 obs_space = {
     'hull_angle':0,
