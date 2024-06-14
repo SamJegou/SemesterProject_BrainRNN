@@ -14,10 +14,10 @@ from BrainRNN import BrainRNN
 ### Parameters ###
 DUMB_MVT = False
 TRAIN = False
-CONTINUE_TRAINING = False
+CONTINUE_TRAINING = False # True to continue training loading the last save of the model
 SAVE = False # if no training, save states and actions in save directory
 
-TRAIN_ON_ACTION = False
+TRAIN_ON_ACTION = False # True to train with a reward-based action
 
 device = torch.device("cpu") #torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -27,18 +27,23 @@ N_EPISODE = 5
 
 STD_POLICY = 1#1.0*2
 GAMMA = 0.99
-CLIP_ACTION = True
+CLIP_ACTION = True # clips the action to [-1,1] in the ouput of the NN
 
 weights_from_connectome = 'normal'
 weights_additive = True
 
-n_inputs = 0.2
-n_outputs = 0.2
+n_inputs = 0.2 # percentage of input nodes
+n_outputs = 0.2 # percentage of output nodes
 
-filename_suffixe = '_wI09_wG01_in02_out02_std01_act'
+filename_suffixe = '_wI09_wG01_in02_out02_std01_act' # name of the model
 
 SAVE_VIDEO = 5 # save video of training all ... episodes
-SAVE_STATES = 200
+SAVE_STATES = 200 # save states all ... episodes
+
+w_I=0.7
+w_G=0.3
+w_p=0.7
+w_v=0.3
 
 DUMB_PATH = 'data/dumb_ref_states.npy'
 REF_STATES_PATH = 'data/BW_ref_states2.npy'
@@ -50,11 +55,6 @@ else:
 
 if TRAIN_ON_ACTION:
     ref_actions = np.load(REF_ACTIONS_PATH)
-
-w_I=0.7
-w_G=0.3
-w_p=0.7
-w_v=0.3
 
 parser = argparse.ArgumentParser(
                 prog='RL_bipedal',
